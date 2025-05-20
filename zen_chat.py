@@ -6,7 +6,6 @@ import os
 
 # Set OpenAI API key
 api_key = st.secrets["OPENAI_API_KEY"]
-st.write(f"Using API key: {api_key}")
 
 # Define prompt template
 text_prompt = PromptTemplate.from_template("""
