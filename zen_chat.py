@@ -37,21 +37,22 @@ def handle_code(user_input):
     return "Python code that handles -> '" + user_input + "'"
 
 # Streamlit UI
-st.title("Zen")
-user_input = st.text_input("Ask me anything!", "")
-
-if user_input:
-    route = route_input(user_input)
-    if route == "text":
-        response = handle_text(user_input)
-    elif route == "image":
-        response = handle_image(user_input)
-    elif route == "code":
-        response = handle_code(user_input)
-    else:
-        response = "I don't understand that request."
-
-    st.write(response)
+def main()
+    st.title("Zen")
+    user_input = st.text_input("Ask me anything!", "")
+    
+    if user_input:
+        route = route_input(user_input)
+        if route == "text":
+            response = handle_text(user_input)
+        elif route == "image":
+            response = handle_image(user_input)
+        elif route == "code":
+            response = handle_code(user_input)
+        else:
+            response = "I don't understand that request."
+    
+        st.write(response)
 
 if __name__ == "__main__":
     main()
