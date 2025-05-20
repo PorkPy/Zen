@@ -13,18 +13,18 @@ Features
 ✅ Live query handling using OpenAI’s API
 
 How to Run
-- 1. Clone the repository:
+1. Clone the repository:
 ```bash
 git clone <your-repo-url>
 cd <repo-name>
 ```
 
-- 2. Install dependencies:
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-- 3. Run the Streamlit app:
+3. Run the Streamlit app:
 ```bash
 streamlit run app.py
 ```
