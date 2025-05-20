@@ -14,6 +14,10 @@ Features
 
 How to Run
 - Clone the repository:
+```
+git clone <your-repo-url>
+cd <repo-name>
+```
 git clone <your-repo-url>
 cd <repo-name>
 - Install dependencies:
