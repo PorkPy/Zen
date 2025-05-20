@@ -37,7 +37,7 @@ def handle_code(user_input):
     return "Python code that handles -> '" + user_input + "'"
 
 # Streamlit UI
-def main()
+def main():
     st.title("Zen")
     user_input = st.text_input("Ask me anything!", "")
     
