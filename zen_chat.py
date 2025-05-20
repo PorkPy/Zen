@@ -5,7 +5,8 @@ from langchain.prompts import PromptTemplate
 import os
 
 # Set OpenAI API key
-os.environ['OPENAI_API_KEY'] = ""
+api_key = st.secrets["OPENAI_API_KEY"]
+st.write(f"Using API key: {api_key}")
 
 # Define prompt template
 text_prompt = PromptTemplate.from_template("""
