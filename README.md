@@ -14,7 +14,7 @@ Features
 
 How to Run
 - Clone the repository:
-```
+```bash
 git clone <your-repo-url>
 cd <repo-name>
 ```
