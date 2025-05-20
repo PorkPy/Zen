@@ -53,3 +53,6 @@ if user_input:
         response = "I don't understand that request."
 
     st.write(response)
+
+if __name__ == "__main__":
+    main()
