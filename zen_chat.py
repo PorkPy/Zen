@@ -2,58 +2,34 @@ import streamlit as st
 from langchain.llms import OpenAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
-import os
+from langchain.memory import ConversationBufferMemory
 
-# Set OpenAI API key
+# Set OpenAI API Key from Streamlit Secrets
 api_key = st.secrets["OPENAI_API_KEY"]
 
-# Define prompt template
+# Initialize Memory for conversation history
+memory = ConversationBufferMemory(memory_key="chat_history")
+
+# Define Prompt Template with conversation memory
 text_prompt = PromptTemplate.from_template("""
-Answer this question in the style of a monk who never gives a straight answer and only replys using minimalistic spiritual metaphor:
-{question}
+You are a helpful assistant. Here is the conversation so far:
+{chat_history}
+
+Now respond to: {question}
 """)
 
-# Create LLM chain
+# Create LLM Chain with Memory
 llm = OpenAI(temperature=0)
-qa_chain = LLMChain(prompt=text_prompt, llm=llm)
+qa_chain = LLMChain(prompt=text_prompt, llm=llm, memory=memory)
 
-# Router function
-def route_input(user_input):
-    if any(x in user_input.lower() for x in ["draw", "image", "picture"]):
-        return "image"
-    elif any(x in user_input.lower() for x in ["code", "python", "script"]):
-        return "code"
-    else:
-        return "text"
-
-# Define behavior for each type
-def handle_text(user_input):
-    return qa_chain.run({"question": user_input})
-
-def handle_image(user_input):
-    return "Imagine a beautiful picture based on -> '" + user_input + "'"
-
-def handle_code(user_input):
-    return "Python code that handles -> '" + user_input + "'"
-
-# Streamlit UI
+# Define the main function
 def main():
-    st.title("Zen")
+    st.title("Zen AI")
     user_input = st.text_input("Ask me anything!", "")
-    
+
     if user_input:
-        route = route_input(user_input)
-        if route == "text":
-            response = handle_text(user_input)
-        elif route == "image":
-            response = handle_image(user_input)
-        elif route == "code":
-            response = handle_code(user_input)
-        else:
-            response = "I don't understand that request."
-    
+        response = qa_chain.run({"question": user_input})
         st.write(response)
 
 if __name__ == "__main__":
     main()
-
