@@ -39,15 +39,15 @@ def main():
 
     if user_input:
         response = qa_chain.run({"question": user_input, "chat_history": "\n".join(st.session_state["chat_history"])})
-        
+
         # Append conversation to history
         st.session_state["chat_history"].append(f"**You:** {user_input}")
         st.session_state["chat_history"].append(f"**Zen AI:** {response}")
 
-        # Clear the input box safely
-        st.session_state.clear()
+        # Clear the input field only (not the entire session state!)
+        st.session_state["user_input"] = ""
 
-        # Refresh page to display updated conversation
+        # Refresh the page to display updated conversation
         st.rerun()
 
 if __name__ == "__main__":
