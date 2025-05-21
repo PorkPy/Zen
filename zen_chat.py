@@ -4,54 +4,74 @@ from langchain.chains import LLMChain
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 
+# Set page config first (must be the first Streamlit command)
+st.set_page_config(page_title="Zen AI", page_icon="🧘")
+
 # Set OpenAI API Key from Streamlit Secrets
-api_key = st.secrets["OPENAI_API_KEY"]
+openai_api_key = st.secrets["OPENAI_API_KEY"]
 
-# Initialize Memory (Session-Based Storage)
-memory = ConversationBufferMemory(memory_key="chat_history")
+# Initialize Memory in session state
+if "memory" not in st.session_state:
+    st.session_state.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-# Define Prompt Template (Includes chat history)
-text_prompt = PromptTemplate.from_template("""
-Here is the conversation so far:
+# Initialize message history in session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Define Prompt Template
+template = """
+You are Zen AI, a calm and wise assistant.
+
+Conversation history:
 {chat_history}
 
-Now respond to: {question}
-""")
+Human question: {human_input}
 
-# Create LLM Chain (Links Memory)
-llm = OpenAI(temperature=0)
-qa_chain = LLMChain(prompt=text_prompt, llm=llm, memory=memory)
+Please provide a thoughtful response:
+"""
+
+prompt = PromptTemplate(
+    input_variables=["chat_history", "human_input"],
+    template=template
+)
+
+# Create LLM Chain
+llm = OpenAI(temperature=0.7, openai_api_key=openai_api_key)
+chain = LLMChain(
+    llm=llm,
+    prompt=prompt,
+    memory=st.session_state.memory
+)
 
 # Streamlit UI
-def main():
-    st.title("Zen AI")
+st.title("Zen AI")
+st.write("Ask me anything for mindful guidance and wisdom.")
 
-    # Initialize chat history in session state
-    if "chat_history" not in st.session_state:
-        st.session_state["chat_history"] = []
+# Display chat messages
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
 
-    # Show conversation history above input
-    for entry in st.session_state["chat_history"]:
-        st.write(entry)
+# Chat input
+if user_input := st.chat_input("Ask Zen..."):
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    
+    # Display user message
+    with st.chat_message("user"):
+        st.write(user_input)
+    
+    # Generate AI response
+    with st.chat_message("assistant"):
+        with st.spinner("Contemplating..."):
+            response = chain.run(human_input=user_input)
+            st.write(response)
+    
+    # Add AI response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
-    # User input field
-    user_input = st.text_input("Ask Zen", value=st.session_state.get("user_input", ""), key="user_input")
-
-    # Submit button to process input
-    if st.button("Submit"):
-        if user_input:
-            response = qa_chain.run({"question": user_input, "chat_history": "\n".join(st.session_state["chat_history"])})
-
-            # Append conversation to history
-            st.session_state["chat_history"].append(f"**You:** {user_input}")
-            st.session_state["chat_history"].append(f"**Zen AI:** {response}")
-
-            # Clear input field
-            st.session_state["user_input"] = ""
-
-    # Clear history button
-    if st.button("Clear Chat History"):
-        st.session_state["chat_history"] = []
-
-if __name__ == "__main__":
-    main()
+# Clear chat button
+if st.sidebar.button("Clear Conversation"):
+    st.session_state.messages = []
+    st.session_state.memory.clear()
+    st.experimental_rerun()
