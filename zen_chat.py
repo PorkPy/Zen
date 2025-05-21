@@ -34,10 +34,10 @@ def main():
     for entry in st.session_state["chat_history"]:
         st.write(entry)
 
-    # User input field with session state retrieval
+    # User input field
     user_input = st.text_input("Ask Zen", value=st.session_state.get("user_input", ""), key="user_input")
 
-    # Submit button to trigger response processing
+    # Submit button to process input
     if st.button("Submit"):
         if user_input:
             response = qa_chain.run({"question": user_input, "chat_history": "\n".join(st.session_state["chat_history"])})
@@ -46,10 +46,12 @@ def main():
             st.session_state["chat_history"].append(f"**You:** {user_input}")
             st.session_state["chat_history"].append(f"**Zen AI:** {response}")
 
-            # Clear input field safely by updating session state
+            # Clear input field
             st.session_state["user_input"] = ""
 
-            # Display the updated history without forcing a page refresh
+    # Clear history button
+    if st.button("Clear Chat History"):
+        st.session_state["chat_history"] = []
 
 if __name__ == "__main__":
     main()
