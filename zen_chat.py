@@ -45,7 +45,7 @@ def main():
         st.session_state["chat_history"].append(f"**Zen AI:** {response}")
 
         # Refresh the page to display the updated history
-        st.experimental_rerun()
-
+        st.rerun()
+        
 if __name__ == "__main__":
     main()
