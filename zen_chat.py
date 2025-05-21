@@ -73,5 +73,4 @@ if user_input := st.chat_input("Ask Zen..."):
 # Clear chat button
 if st.sidebar.button("Clear Conversation"):
     st.session_state.messages = []
-    st.session_state.memory.clear()
-    st.experimental_rerun()
+    st.session_state.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
