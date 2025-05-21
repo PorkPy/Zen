@@ -35,7 +35,7 @@ def main():
         st.write(entry)
 
     # User input field
-    user_input = st.text_input("Ask me anything!", "", key="user_input")
+    user_input = st.text_input("Ask Zen", value="", key="user_input")
 
     if user_input:
         response = qa_chain.run({"question": user_input, "chat_history": "\n".join(st.session_state["chat_history"])})
@@ -44,8 +44,8 @@ def main():
         st.session_state["chat_history"].append(f"**You:** {user_input}")
         st.session_state["chat_history"].append(f"**Zen AI:** {response}")
 
-        # Clear the input box
-        st.session_state["user_input"] = ""
+        # Clear the input box safely
+        st.session_state.clear()
 
         # Refresh page to display updated conversation
         st.rerun()
