@@ -7,7 +7,7 @@ from langchain.prompts import PromptTemplate
 # Set OpenAI API Key from Streamlit Secrets
 api_key = st.secrets["OPENAI_API_KEY"]
 
-# Initialize Memory (Ensures session persistence)
+# Initialize Memory (Session-Based Storage)
 memory = ConversationBufferMemory(memory_key="chat_history")
 
 # Define Prompt Template (Includes chat history)
@@ -28,17 +28,24 @@ def main():
 
     # Initialize chat history in session state
     if "chat_history" not in st.session_state:
-        st.session_state["chat_history"] = ""
+        st.session_state["chat_history"] = []
 
+    # Show conversation history above input
+    for entry in st.session_state["chat_history"]:
+        st.write(entry)
+
+    # User input field
     user_input = st.text_input("Ask me anything!", "")
 
     if user_input:
-        response = qa_chain.run({"question": user_input, "chat_history": st.session_state["chat_history"]})
+        response = qa_chain.run({"question": user_input, "chat_history": "\n".join(st.session_state["chat_history"])})
         
-        # Update chat history
-        st.session_state["chat_history"] += f"User: {user_input}\nAI: {response}\n"
-        
-        st.write(response)
+        # Append conversation to history
+        st.session_state["chat_history"].append(f"**You:** {user_input}")
+        st.session_state["chat_history"].append(f"**Zen AI:** {response}")
+
+        # Refresh the page to display the updated history
+        st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
