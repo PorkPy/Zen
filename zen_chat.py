@@ -39,7 +39,7 @@ prompt = PromptTemplate(
 )
 
 # Create LLM Chain
-llm = OpenAI(temperature=0.7, openai_api_key=openai_api_key)
+llm = OpenAI(temperature=0.4, openai_api_key=openai_api_key)
 chain = LLMChain(
     llm=llm,
     prompt=prompt,
