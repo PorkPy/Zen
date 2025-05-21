@@ -47,8 +47,8 @@ chain = LLMChain(
 )
 
 # Streamlit UI
-st.title("Zen AI")
-st.write("Ask me anything for mindful guidance and wisdom.")
+st.title("Zen")
+st.write("Welcome to Zen—Your Special Education Companion.")
 
 # Display chat messages
 for message in st.session_state.messages:
