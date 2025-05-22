@@ -1,6 +1,6 @@
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import LLMChain
-from langchain.llms import OpenAI
+from langchain_openai import OpenAI
 from langchain.prompts import PromptTemplate
 
 def create_factual_chain(openai_api_key):
