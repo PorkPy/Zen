@@ -21,15 +21,15 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Streamlit UI
-st.title("Special Education Zen AI")
-st.write("Your specialized assistant for special educational needs guidance and wisdom.")
+st.title("Educational Psychology Zen AI")
+st.write("Your supportive colleague for educational psychology guidance and professional development.")
 
 # Sidebar with resources
 with st.sidebar:
     st.header("Helpful Resources")
-    st.markdown("[National Center for Learning Disabilities](https://www.ncld.org/)")
-    st.markdown("[Council for Exceptional Children](https://exceptionalchildren.org/)")
-    st.markdown("[IDEA Resources](https://sites.ed.gov/idea/)")
+    st.markdown("[British Psychological Society](https://www.bps.org.uk/)")
+    st.markdown("[Association of Educational Psychologists](https://www.aep.org.uk/)")
+    st.markdown("[SEND Code of Practice](https://www.gov.uk/government/publications/send-code-of-practice-0-to-25)")
     
     st.markdown("---")
     
@@ -44,7 +44,7 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 # Chat input
-if user_input := st.chat_input("Ask about special educational needs..."):
+if user_input := st.chat_input("Ask about EP practice, cases, or professional development..."):
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": user_input})
     
