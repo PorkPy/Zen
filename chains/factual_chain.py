@@ -1,20 +1,16 @@
-from langchain.memory import ConversationBufferMemory
 from langchain.chains import LLMChain
 from langchain_openai import OpenAI
 from langchain.prompts import PromptTemplate
 
 def create_factual_chain(openai_api_key):
     """
-    Creates a low-temperature chain focused on factual, evidence-based responses
-    for special educational needs questions.
+    Creates a low-temperature chain focused on factual, evidence-based responses.
+    This chain has no memory since it's just generating advice that gets enhanced.
     """
     
-    # Create memory for this chain
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    
-    # Define the factual prompt template
+    # Define the factual prompt template (no conversation history needed)
     factual_template = """
-You are a knowledgeable educational psychology colleague sharing evidence-based guidance with a fellow EP.
+You are a knowledgeable educational psychology colleague providing evidence-based guidance.
 
 IMPORTANT GUIDELINES:
 - Assume you're speaking to an educational psychologist (trainee or qualified)
@@ -25,16 +21,13 @@ IMPORTANT GUIDELINES:
 - Acknowledge their professional expertise and judgment
 - Do NOT include generic statements about inclusion or basic EP principles
 
-Conversation history:
-{chat_history}
-
 EP's query: {human_input}
 
 Provide focused, colleague-to-colleague guidance:
 """
 
     prompt = PromptTemplate(
-        input_variables=["chat_history", "human_input"],
+        input_variables=["human_input"],
         template=factual_template
     )
     
@@ -45,11 +38,10 @@ Provide focused, colleague-to-colleague guidance:
         max_tokens=350  # Increased to prevent cutoffs
     )
     
-    # Create and return the chain
+    # Create chain WITHOUT memory (just pure advice generation)
     chain = LLMChain(
         llm=llm,
         prompt=prompt,
-        memory=memory,
         verbose=False
     )
     
