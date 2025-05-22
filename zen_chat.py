@@ -1,55 +1,42 @@
 import streamlit as st
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import LLMChain
-from langchain.llms import OpenAI
-from langchain.prompts import PromptTemplate
+from chains.factual_chain import create_factual_chain
+from chains.engagement_chain import create_engagement_chain
+from chains.response_combiner import combine_responses
 
-# Set page config first (must be the first Streamlit command)
-st.set_page_config(page_title="Zen AI", page_icon="🧘")
+# Set page config first
+st.set_page_config(page_title="Special Education Zen AI", page_icon="🧘")
 
 # Set OpenAI API Key from Streamlit Secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 
-# Initialize Memory in session state
-if "memory" not in st.session_state:
-    st.session_state.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+# Initialize chains in session state
+if "factual_chain" not in st.session_state:
+    st.session_state.factual_chain = create_factual_chain(openai_api_key)
+
+if "engagement_chain" not in st.session_state:
+    st.session_state.engagement_chain = create_engagement_chain(openai_api_key)
 
 # Initialize message history in session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Define Prompt Template
-template = """
-You are Zen AI, a specialized assistant for special educational needs professionals.
-You provide calm, wise, and evidence-based guidance related to special education.
-Always assume questions are related to special educational needs contexts and come from an educational psychologist.
-Consider inclusive education practices, differentiation techniques, and supportive interventions.
-Do not tell the user how important special education is; they already know.
-
-Conversation history:
-{chat_history}
-
-Human question: {human_input}
-
-Please provide a thoughtful response that considers special education best practices:
-"""
-
-prompt = PromptTemplate(
-    input_variables=["chat_history", "human_input"],
-    template=template
-)
-
-# Create LLM Chain
-llm = OpenAI(temperature=0.4, openai_api_key=openai_api_key)
-chain = LLMChain(
-    llm=llm,
-    prompt=prompt,
-    memory=st.session_state.memory
-)
-
 # Streamlit UI
-st.title("Zen")
-st.write("Welcome to Zen—Your Special Education Companion.")
+st.title("Special Education Zen AI")
+st.write("Your specialized assistant for special educational needs guidance and wisdom.")
+
+# Sidebar with resources
+with st.sidebar:
+    st.header("Helpful Resources")
+    st.markdown("[National Center for Learning Disabilities](https://www.ncld.org/)")
+    st.markdown("[Council for Exceptional Children](https://exceptionalchildren.org/)")
+    st.markdown("[IDEA Resources](https://sites.ed.gov/idea/)")
+    
+    st.markdown("---")
+    
+    # Feature toggles for development
+    st.header("Response Style")
+    use_dual_temp = st.checkbox("Enhanced Engagement", value=True, 
+                               help="Combines factual accuracy with empathetic engagement")
 
 # Display chat messages
 for message in st.session_state.messages:
@@ -57,7 +44,7 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 # Chat input
-if user_input := st.chat_input("Ask Zen..."):
+if user_input := st.chat_input("Ask about special educational needs..."):
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": user_input})
     
@@ -67,14 +54,31 @@ if user_input := st.chat_input("Ask Zen..."):
     
     # Generate AI response
     with st.chat_message("assistant"):
-        with st.spinner("Contemplating..."):
-            response = chain.run(human_input=user_input)
-            st.write(response)
+        with st.spinner("Contemplating your question..."):
+            if use_dual_temp:
+                # Get factual response
+                factual_response = st.session_state.factual_chain.run(human_input=user_input)
+                
+                # Get engagement response
+                engagement_response = st.session_state.engagement_chain.run(
+                    human_input=user_input,
+                    factual_content=factual_response
+                )
+                
+                # Combine responses
+                final_response = combine_responses(factual_response, engagement_response)
+            else:
+                # Use just the factual chain
+                final_response = st.session_state.factual_chain.run(human_input=user_input)
+            
+            st.write(final_response)
     
     # Add AI response to chat history
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    st.session_state.messages.append({"role": "assistant", "content": final_response})
 
 # Clear chat button
 if st.sidebar.button("Clear Conversation"):
     st.session_state.messages = []
-    st.session_state.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    # Reset the chains to clear their memory
+    st.session_state.factual_chain = create_factual_chain(openai_api_key)
+    st.session_state.engagement_chain = create_engagement_chain(openai_api_key)
