@@ -30,14 +30,14 @@ streamlit run app.py
 ```
 
 # Project Structure
-your-project/
-├── main_app.py          # Main Streamlit app (what Streamlit Cloud runs)
-├── chains/
+your-project/\
+├── main_app.py          # Main Streamlit app (what Streamlit Cloud runs)\
+├── chains/\
 │   ├── __init__.py
-│   ├── factual_chain.py    # Low temp factual responses
-│   ├── engagement_chain.py # High temp engagement
-│   └── psycho_analysis.py  # Future psycholinguistic analysis
-├── prompts/
-│   ├── __init__.py
-│   └── sen_prompts.py      # All your prompt templates
-└── requirements.txt
+│   ├── factual_chain.py    # Low temp factual responses\
+│   ├── engagement_chain.py # High temp engagement\
+│   └── psycho_analysis.py  # Future psycholinguistic analysis\
+├── prompts/\
+│   ├── __init__.py\
+│   └── sen_prompts.py      # All your prompt templates\
+└── requirements.txt\
