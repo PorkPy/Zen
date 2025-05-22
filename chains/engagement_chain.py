@@ -43,7 +43,7 @@ Enhance this response by adding warmth and professional support while staying st
     llm = OpenAI(
         temperature=0.7,  # Higher for more varied, empathetic responses
         openai_api_key=openai_api_key,
-        max_tokens=300  # Increased to prevent cutoffs
+        max_tokens=500  # Needs to be larger since it's including the full factual response + enhancements
     )
     
     # Create chain WITHOUT memory to avoid input key conflicts
