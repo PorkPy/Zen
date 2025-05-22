@@ -1,4 +1,3 @@
-from langchain.memory import ConversationBufferMemory
 from langchain.chains import LLMChain
 from langchain_openai import OpenAI
 from langchain.prompts import PromptTemplate
@@ -7,10 +6,8 @@ def create_engagement_chain(openai_api_key):
     """
     Creates a higher-temperature chain focused on empathetic engagement
     and generating thoughtful follow-up questions.
+    Note: This chain doesn't use memory to avoid conflicts with multiple input variables.
     """
-    
-    # Create memory for this chain
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     
     # Define the engagement prompt template
     engagement_template = """
@@ -26,14 +23,11 @@ Given this factual content: {factual_content}
 
 And this original question: {human_input}
 
-Conversation history:
-{chat_history}
-
 Add empathetic engagement and generate thoughtful follow-up questions:
 """
 
     prompt = PromptTemplate(
-        input_variables=["chat_history", "human_input", "factual_content"],
+        input_variables=["human_input", "factual_content"],
         template=engagement_template
     )
     
@@ -44,12 +38,12 @@ Add empathetic engagement and generate thoughtful follow-up questions:
         max_tokens=200  # Shorter for just engagement elements
     )
     
-    # Create and return the chain
+    # Create chain WITHOUT memory to avoid input key conflicts
     chain = LLMChain(
         llm=llm,
         prompt=prompt,
-        memory=memory,
         verbose=False
+        # Note: No memory here since we have multiple input variables
     )
     
     return chain
