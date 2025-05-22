@@ -59,21 +59,14 @@ if user_input := st.chat_input("Ask about special educational needs..."):
                 # Get factual response
                 factual_response = st.session_state.factual_chain.run(human_input=user_input)
                 
-                # Get engagement response - pass all required inputs as a dict
-                engagement_inputs = {
-                    "human_input": user_input,
-                    "factual_content": factual_response
-                }
-                engagement_response = st.session_state.engagement_chain.invoke(engagement_inputs)
-                
-                # Extract the response text
-                if isinstance(engagement_response, dict):
-                    engagement_text = engagement_response.get("text", str(engagement_response))
-                else:
-                    engagement_text = str(engagement_response)
+                # Get engagement response using run() method
+                engagement_response = st.session_state.engagement_chain.run(
+                    human_input=user_input,
+                    factual_content=factual_response
+                )
                 
                 # Combine responses
-                final_response = combine_responses(factual_response, engagement_text)
+                final_response = combine_responses(factual_response, engagement_response)
             else:
                 # Use just the factual chain
                 final_response = st.session_state.factual_chain.run(human_input=user_input)
