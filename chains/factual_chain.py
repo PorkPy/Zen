@@ -42,7 +42,7 @@ Provide focused, colleague-to-colleague guidance:
     llm = OpenAI(
         temperature=0.1,  # Very low for factual consistency
         openai_api_key=openai_api_key,
-        max_tokens=300  # Keep responses focused
+        max_tokens=350  # Increased to prevent cutoffs
     )
     
     # Create and return the chain
