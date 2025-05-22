@@ -1,19 +1,18 @@
-def combine_responses(factual_response, engagement_response):
+def combine_responses(factual_response, enhanced_response):
     """
-    Combines factual and engagement responses into a cohesive, natural response.
+    Since the engagement chain now enhances the factual response into one cohesive response,
+    we just return the enhanced version (which includes the factual content).
     
     Args:
-        factual_response (str): The factual, low-temperature response
-        engagement_response (str): The empathetic, high-temperature response with follow-ups
+        factual_response (str): The original factual response (for reference)
+        enhanced_response (str): The enhanced response that incorporates the factual content
     
     Returns:
-        str: Combined response that flows naturally
+        str: The enhanced response
     """
     
-    # Basic combination - you can make this more sophisticated later
-    combined = f"{factual_response}\n\n{engagement_response}"
-    
-    return combined.strip()
+    # The enhanced response should already be a complete, cohesive response
+    return enhanced_response.strip()
 
 def extract_follow_up_questions(engagement_response):
     """
