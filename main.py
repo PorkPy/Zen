@@ -59,14 +59,11 @@ if user_input := st.chat_input("Ask about EP practice, cases, or professional de
                 # Get factual response
                 factual_response = st.session_state.factual_chain.run(human_input=user_input)
                 
-                # Get engagement response using run() method
-                engagement_response = st.session_state.engagement_chain.run(
-                    human_input=user_input,
-                    factual_content=factual_response
-                )
+                # Combine into single input for engagement chain
+                combined_input = f"Original EP question: {user_input}\n\nFactual advice to enhance: {factual_response}"
                 
-                # Combine responses
-                final_response = combine_responses(factual_response, engagement_response)
+                # Get enhanced response using simple single-input approach
+                final_response = st.session_state.engagement_chain.run(input=combined_input)
             else:
                 # Use just the factual chain
                 final_response = st.session_state.factual_chain.run(human_input=user_input)
@@ -79,6 +76,6 @@ if user_input := st.chat_input("Ask about EP practice, cases, or professional de
 # Clear chat button
 if st.sidebar.button("Clear Conversation"):
     st.session_state.messages = []
-    # Reset the chains to clear their memory
+    # Reset both chains to clear their memory
     st.session_state.factual_chain = create_factual_chain(openai_api_key)
     st.session_state.engagement_chain = create_engagement_chain(openai_api_key)
