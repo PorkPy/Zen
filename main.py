@@ -16,21 +16,32 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Streamlit UI
-st.title("Educational Psychology Zen AI")
-st.write("Your supportive colleague for educational psychology guidance and professional development.")
+st.title("Zen")
+st.caption("For Educational Psychologists")
+st.write("")  # Add some spacing
 
-# Sidebar with resources
+# Sidebar with resources and info
 with st.sidebar:
-    st.header("Helpful Resources")
-    st.markdown("[British Psychological Society](https://www.bps.org.uk/)")
+    st.header("📚 Professional Bodies")
+    st.markdown("[BPS Division of Educational Psychology](https://www.bps.org.uk/divisions/educational-psychology)")
     st.markdown("[Association of Educational Psychologists](https://www.aep.org.uk/)")
+    
+    st.header("📋 Key Resources")
     st.markdown("[SEND Code of Practice](https://www.gov.uk/government/publications/send-code-of-practice-0-to-25)")
+    st.markdown("[NICE Guidelines](https://www.nice.org.uk/)")
+    st.markdown("[Mental Capacity Act](https://www.legislation.gov.uk/ukpga/2005/9/contents)")
     
     st.markdown("---")
     
-    # Simple settings
-    st.header("Settings")
-    st.write("Using balanced single-chain approach for optimal EP support.")
+    st.header("ℹ️ About Zen")
+    st.write("Zen is your supportive AI colleague for EP practice. Ask questions about cases, interventions, assessments, or professional development.")
+    
+    st.write("**How to use:**")
+    st.write("• Ask questions naturally, as you would a colleague")
+    st.write("• Reference previous topics in follow-up questions") 
+    st.write("• Request specific frameworks, tools, or strategies")
+    
+    st.markdown("---")
 
 # Display chat messages
 for message in st.session_state.messages:
