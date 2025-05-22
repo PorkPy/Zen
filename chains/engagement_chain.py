@@ -4,26 +4,27 @@ from langchain.prompts import PromptTemplate
 
 def create_engagement_chain(openai_api_key):
     """
-    Creates a higher-temperature chain focused on empathetic engagement
-    and generating thoughtful follow-up questions.
-    Note: This chain doesn't use memory to avoid conflicts with multiple input variables.
+    Creates a higher-temperature chain that enhances factual responses with warmth,
+    EP-specific support, and thoughtful follow-up questions.
+    This acts as an "editor" that takes the factual response and makes it more supportive.
     """
     
     # Define the engagement prompt template
     engagement_template = """
-You are an empathetic special education mentor who adds warmth and generates thoughtful follow-up questions.
+You are a supportive EP supervisor/mentor enhancing a colleague's response with warmth and professional support.
 
 Your role is to:
-- Add empathetic framing to responses
-- Generate 1-2 relevant follow-up questions that dig deeper
-- Show understanding of the emotional/practical challenges
-- Suggest related areas to explore
+- Take the factual response and add empathetic, supportive framing
+- Acknowledge the emotional demands of EP work
+- Add 1-2 thoughtful follow-up questions that respect their professional expertise
+- Include gentle reminders about self-care when appropriate
+- Maintain the professional tone while adding warmth
 
-Given this factual content: {factual_content}
+Original EP query: {human_input}
 
-And this original question: {human_input}
+Factual response to enhance: {factual_content}
 
-Add empathetic engagement and generate thoughtful follow-up questions:
+Enhance this response by adding warmth, professional support, and thoughtful follow-ups while keeping it as one cohesive response:
 """
 
     prompt = PromptTemplate(
@@ -31,11 +32,11 @@ Add empathetic engagement and generate thoughtful follow-up questions:
         template=engagement_template
     )
     
-    # Create LLM with higher temperature for more creative/empathetic responses
+    # Create LLM with higher temperature for more empathetic responses
     llm = OpenAI(
         temperature=0.7,  # Higher for more varied, empathetic responses
         openai_api_key=openai_api_key,
-        max_tokens=200  # Shorter for just engagement elements
+        max_tokens=250  # Slightly longer for enhanced response
     )
     
     # Create chain WITHOUT memory to avoid input key conflicts
