@@ -2,7 +2,7 @@ import streamlit as st
 from chains.simple_ep_chain import create_ep_chain
 
 # Set page config first
-st.set_page_config(page_title="Special Education Zen AI", page_icon="🧘")
+st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
 
 # Set OpenAI API Key from Streamlit Secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
@@ -16,7 +16,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Streamlit UI
-st.title("Zen")
+st.title("Jess")
 st.caption("For Educational Psychologists")
 st.write("")  # Add some spacing
 
@@ -33,8 +33,8 @@ with st.sidebar:
     
     st.markdown("---")
     
-    st.header("ℹ️ About Zen")
-    st.write("Zen is your supportive AI colleague for EP practice. Ask questions about cases, interventions, assessments, or professional development.")
+    st.header("ℹ️ About Jess")
+    st.write("Jess is your supportive AI colleague for EP practice. Ask questions about cases, interventions, assessments, or professional development.")
     
     st.write("**How to use:**")
     st.write("• Ask questions naturally, as you would a colleague")
@@ -49,7 +49,7 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 # Chat input
-if user_input := st.chat_input("Ask about EP practice, cases, or professional development..."):
+if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": user_input})
     
@@ -59,7 +59,7 @@ if user_input := st.chat_input("Ask about EP practice, cases, or professional de
     
     # Generate AI response
     with st.chat_message("assistant"):
-        with st.spinner("Thinking through this with you..."):
+        with st.spinner("Jess is thinking through this with you..."):
             final_response = st.session_state.ep_chain.run(human_input=user_input)
             st.write(final_response)
     
