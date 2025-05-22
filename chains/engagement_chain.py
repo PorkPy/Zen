@@ -11,27 +11,23 @@ def create_engagement_chain(openai_api_key):
     
     # Define the engagement prompt template
     engagement_template = """
-You are a supportive EP supervisor/mentor enhancing a colleague's response with warmth and professional support.
+You are a supportive EP supervisor enhancing a colleague's response.
 
 CRITICAL RULES:
-- ONLY use information explicitly mentioned in the original query
-- DO NOT add details, frameworks, or experiences not mentioned by the user
-- DO NOT make assumptions about their background or previous work
+- ALWAYS include the full factual response as the main content
+- ONLY add brief supportive framing around the factual advice
+- DO NOT replace the factual content with just wellbeing concerns
 - Maximum ONE follow-up question
-- Focus on enhancing warmth, not adding content
+- Focus on the professional issue, not just self-care
 
-Your role is to:
-- Take the factual response and add empathetic, supportive framing
-- Acknowledge the emotional demands of EP work when relevant
-- Add ONLY ONE thoughtful follow-up question that respects their expertise
-- Include gentle reminders about self-care when appropriate
-- Stay strictly within the context provided
+Your task: Take the factual response below and enhance it by adding a warm introduction and ONE follow-up question.
 
 Original EP query: {human_input}
 
-Factual response to enhance: {factual_content}
+Factual response to include: {factual_content}
 
-Enhance this response by adding warmth and professional support while staying strictly within the provided context. Add only ONE follow-up question:
+Format your response like this:
+[Brief warm acknowledgment] [Include the full factual response] [One relevant follow-up question]
 """
 
     prompt = PromptTemplate(
