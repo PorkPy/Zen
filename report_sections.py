@@ -195,4 +195,128 @@ def render_report_section(section_name, current_section, total_sections, report_
         
     elif section_name == "Educational Attainment":
         st.write("Educational attainment and academic performance:")
-        st.caption("💭 *Note current academic levels, progress,
+        st.caption("💭 *Note current academic levels, progress, and curriculum access naturally.*")
+        
+        academic_levels = st.text_area("Current academic levels and attainment:", 
+                                     value=report_data.get("academic_levels", ""),
+                                     key="academic_levels",
+                                     help="Reading age, maths levels, National Curriculum levels, etc.")
+        
+        curriculum_access = st.text_area("Access to curriculum and learning:", 
+                                        value=report_data.get("curriculum_access", ""),
+                                        key="curriculum_access",
+                                        help="How well can they access mainstream curriculum?")
+        
+        academic_strengths = st.text_area("Academic strengths and interests:", 
+                                        value=report_data.get("academic_strengths", ""),
+                                        key="academic_strengths",
+                                        help="What subjects/areas does the child excel in?")
+        
+        learning_barriers = st.text_area("Barriers to learning and progress:", 
+                                        value=report_data.get("learning_barriers", ""),
+                                        key="learning_barriers",
+                                        help="What's preventing optimal academic progress?")
+        
+        section_data = {
+            "academic_levels": academic_levels,
+            "curriculum_access": curriculum_access,
+            "academic_strengths": academic_strengths,
+            "learning_barriers": learning_barriers
+        }
+        
+    elif section_name == "Social, Emotional & Behavioral Factors":
+        st.write("Social, emotional and behavioral observations:")
+        st.caption("💭 *Describe the child's social interactions, emotional regulation, and behavior patterns.*")
+        
+        social_skills = st.text_area("Social skills and peer relationships:", 
+                                   value=report_data.get("social_skills", ""),
+                                   key="social_skills",
+                                   help="How does the child interact with peers and adults?")
+        
+        emotional_regulation = st.text_area("Emotional development and regulation:", 
+                                          value=report_data.get("emotional_regulation", ""),
+                                          key="emotional_regulation",
+                                          help="How does the child manage emotions and stress?")
+        
+        behavioral_patterns = st.text_area("Behavioral observations and patterns:", 
+                                         value=report_data.get("behavioral_patterns", ""),
+                                         key="behavioral_patterns",
+                                         help="Any concerning or notable behavioral patterns?")
+        
+        self_esteem = st.text_area("Self-esteem and confidence:", 
+                                 value=report_data.get("self_esteem", ""),
+                                 key="self_esteem",
+                                 help="How does the child view themselves and their abilities?")
+        
+        section_data = {
+            "social_skills": social_skills,
+            "emotional_regulation": emotional_regulation,
+            "behavioral_patterns": behavioral_patterns,
+            "self_esteem": self_esteem
+        }
+        
+    elif section_name == "Psychological Formulation":
+        st.write("Your psychological formulation and professional analysis:")
+        st.caption("💭 *This is your expert interpretation - write your professional thoughts naturally.*")
+        
+        formulation = st.text_area("Psychological formulation:", 
+                                 value=report_data.get("formulation", ""),
+                                 key="formulation",
+                                 help="Your professional analysis of what's happening for this child",
+                                 height=150)
+        
+        contributing_factors = st.text_area("Contributing factors and underlying causes:", 
+                                          value=report_data.get("contributing_factors", ""),
+                                          key="contributing_factors",
+                                          help="What factors are contributing to the child's difficulties?")
+        
+        prognosis = st.text_area("Prognosis and future considerations:", 
+                                value=report_data.get("prognosis", ""),
+                                key="prognosis",
+                                help="What's the outlook? What should be considered going forward?")
+        
+        section_data = {
+            "formulation": formulation,
+            "contributing_factors": contributing_factors,
+            "prognosis": prognosis
+        }
+        
+    elif section_name == "Recommendations & Provision":
+        st.write("Recommendations and provision needed:")
+        st.caption("💭 *Specify what support the child needs - be as detailed or brief as works for you.*")
+        
+        educational_provision = st.text_area("Educational provision recommendations:", 
+                                            value=report_data.get("educational_provision", ""),
+                                            key="educational_provision",
+                                            help="What educational support/placement is needed?",
+                                            height=120)
+        
+        interventions = st.text_area("Specific interventions and strategies:", 
+                                   value=report_data.get("interventions", ""),
+                                   key="interventions",
+                                   help="What specific interventions should be implemented?",
+                                   height=120)
+        
+        professional_support = st.text_area("Professional support required:", 
+                                           value=report_data.get("professional_support", ""),
+                                           key="professional_support",
+                                           help="What other professionals need to be involved?")
+        
+        monitoring = st.text_area("Review and monitoring arrangements:", 
+                                value=report_data.get("monitoring", ""),
+                                key="monitoring",
+                                help="How should progress be monitored and reviewed?")
+        
+        section_data = {
+            "educational_provision": educational_provision,
+            "interventions": interventions,
+            "professional_support": professional_support,
+            "monitoring": monitoring
+        }
+    
+    else:
+        st.error(f"Unknown section: {section_name}")
+        return
+    
+    # Render navigation buttons
+    render_navigation_buttons(section_data, current_section, total_sections, db, anthropic_api_key)
