@@ -287,6 +287,284 @@ if st.session_state.report_mode == "ehc_assessment":
                 st.success(f"Report saved! ID: {st.session_state.current_report_id}")
                 st.rerun()
                 
+    elif current_section == "Educational Attainment":
+        st.write("Educational attainment and academic performance:")
+        st.caption("💭 *Note current academic levels, progress, and curriculum access naturally.*")
+        
+        academic_levels = st.text_area("Current academic levels and attainment:", 
+                                     value=st.session_state.report_data.get("academic_levels", ""),
+                                     key="academic_levels",
+                                     help="Reading age, maths levels, National Curriculum levels, etc.")
+        
+        curriculum_access = st.text_area("Access to curriculum and learning:", 
+                                        value=st.session_state.report_data.get("curriculum_access", ""),
+                                        key="curriculum_access",
+                                        help="How well can they access mainstream curriculum?")
+        
+        academic_strengths = st.text_area("Academic strengths and interests:", 
+                                        value=st.session_state.report_data.get("academic_strengths", ""),
+                                        key="academic_strengths",
+                                        help="What subjects/areas does the child excel in?")
+        
+        learning_barriers = st.text_area("Barriers to learning and progress:", 
+                                        value=st.session_state.report_data.get("learning_barriers", ""),
+                                        key="learning_barriers",
+                                        help="What's preventing optimal academic progress?")
+        
+        # Navigation buttons
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section"):
+                st.session_state.current_section -= 1
+                st.rerun()
+        with col2:
+            if st.button("Next Section →"):
+                st.session_state.report_data.update({
+                    "academic_levels": academic_levels,
+                    "curriculum_access": curriculum_access,
+                    "academic_strengths": academic_strengths,
+                    "learning_barriers": learning_barriers
+                })
+                st.session_state.current_section += 1
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_data.update({
+                    "academic_levels": academic_levels,
+                    "curriculum_access": curriculum_access,
+                    "academic_strengths": academic_strengths,
+                    "learning_barriers": learning_barriers
+                })
+                
+                if not st.session_state.current_report_id:
+                    st.session_state.current_report_id = st.session_state.db.generate_report_id(
+                        st.session_state.report_data.get("child_name", "Unknown"), "ehc_assessment"
+                    )
+                
+                st.session_state.db.save_report(
+                    st.session_state.current_report_id,
+                    "ehc_assessment",
+                    st.session_state.report_data.get("child_name", "Unknown"),
+                    st.session_state.report_data,
+                    st.session_state.current_section
+                )
+                
+                st.session_state.report_mode = None
+                st.success(f"Report saved! ID: {st.session_state.current_report_id}")
+                st.rerun()
+                
+    elif current_section == "Social, Emotional & Behavioral Factors":
+        st.write("Social, emotional and behavioral observations:")
+        st.caption("💭 *Describe the child's social interactions, emotional regulation, and behavior patterns.*")
+        
+        social_skills = st.text_area("Social skills and peer relationships:", 
+                                   value=st.session_state.report_data.get("social_skills", ""),
+                                   key="social_skills",
+                                   help="How does the child interact with peers and adults?")
+        
+        emotional_regulation = st.text_area("Emotional development and regulation:", 
+                                          value=st.session_state.report_data.get("emotional_regulation", ""),
+                                          key="emotional_regulation",
+                                          help="How does the child manage emotions and stress?")
+        
+        behavioral_patterns = st.text_area("Behavioral observations and patterns:", 
+                                         value=st.session_state.report_data.get("behavioral_patterns", ""),
+                                         key="behavioral_patterns",
+                                         help="Any concerning or notable behavioral patterns?")
+        
+        self_esteem = st.text_area("Self-esteem and confidence:", 
+                                 value=st.session_state.report_data.get("self_esteem", ""),
+                                 key="self_esteem",
+                                 help="How does the child view themselves and their abilities?")
+        
+        # Navigation buttons
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section"):
+                st.session_state.current_section -= 1
+                st.rerun()
+        with col2:
+            if st.button("Next Section →"):
+                st.session_state.report_data.update({
+                    "social_skills": social_skills,
+                    "emotional_regulation": emotional_regulation,
+                    "behavioral_patterns": behavioral_patterns,
+                    "self_esteem": self_esteem
+                })
+                st.session_state.current_section += 1
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_data.update({
+                    "social_skills": social_skills,
+                    "emotional_regulation": emotional_regulation,
+                    "behavioral_patterns": behavioral_patterns,
+                    "self_esteem": self_esteem
+                })
+                
+                if not st.session_state.current_report_id:
+                    st.session_state.current_report_id = st.session_state.db.generate_report_id(
+                        st.session_state.report_data.get("child_name", "Unknown"), "ehc_assessment"
+                    )
+                
+                st.session_state.db.save_report(
+                    st.session_state.current_report_id,
+                    "ehc_assessment",
+                    st.session_state.report_data.get("child_name", "Unknown"),
+                    st.session_state.report_data,
+                    st.session_state.current_section
+                )
+                
+                st.session_state.report_mode = None
+                st.success(f"Report saved! ID: {st.session_state.current_report_id}")
+                st.rerun()
+                
+    elif current_section == "Psychological Formulation":
+        st.write("Your psychological formulation and professional analysis:")
+        st.caption("💭 *This is your expert interpretation - write your professional thoughts naturally.*")
+        
+        formulation = st.text_area("Psychological formulation:", 
+                                 value=st.session_state.report_data.get("formulation", ""),
+                                 key="formulation",
+                                 help="Your professional analysis of what's happening for this child",
+                                 height=150)
+        
+        contributing_factors = st.text_area("Contributing factors and underlying causes:", 
+                                          value=st.session_state.report_data.get("contributing_factors", ""),
+                                          key="contributing_factors",
+                                          help="What factors are contributing to the child's difficulties?")
+        
+        prognosis = st.text_area("Prognosis and future considerations:", 
+                                value=st.session_state.report_data.get("prognosis", ""),
+                                key="prognosis",
+                                help="What's the outlook? What should be considered going forward?")
+        
+        # Navigation buttons
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section"):
+                st.session_state.current_section -= 1
+                st.rerun()
+        with col2:
+            if st.button("Next Section →"):
+                st.session_state.report_data.update({
+                    "formulation": formulation,
+                    "contributing_factors": contributing_factors,
+                    "prognosis": prognosis
+                })
+                st.session_state.current_section += 1
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_data.update({
+                    "formulation": formulation,
+                    "contributing_factors": contributing_factors,
+                    "prognosis": prognosis
+                })
+                
+                if not st.session_state.current_report_id:
+                    st.session_state.current_report_id = st.session_state.db.generate_report_id(
+                        st.session_state.report_data.get("child_name", "Unknown"), "ehc_assessment"
+                    )
+                
+                st.session_state.db.save_report(
+                    st.session_state.current_report_id,
+                    "ehc_assessment",
+                    st.session_state.report_data.get("child_name", "Unknown"),
+                    st.session_state.report_data,
+                    st.session_state.current_section
+                )
+                
+                st.session_state.report_mode = None
+                st.success(f"Report saved! ID: {st.session_state.current_report_id}")
+                st.rerun()
+                
+    elif current_section == "Recommendations & Provision":
+        st.write("Recommendations and provision needed:")
+        st.caption("💭 *Specify what support the child needs - be as detailed or brief as works for you.*")
+        
+        educational_provision = st.text_area("Educational provision recommendations:", 
+                                            value=st.session_state.report_data.get("educational_provision", ""),
+                                            key="educational_provision",
+                                            help="What educational support/placement is needed?",
+                                            height=120)
+        
+        interventions = st.text_area("Specific interventions and strategies:", 
+                                   value=st.session_state.report_data.get("interventions", ""),
+                                   key="interventions",
+                                   help="What specific interventions should be implemented?",
+                                   height=120)
+        
+        professional_support = st.text_area("Professional support required:", 
+                                           value=st.session_state.report_data.get("professional_support", ""),
+                                           key="professional_support",
+                                           help="What other professionals need to be involved?")
+        
+        monitoring = st.text_area("Review and monitoring arrangements:", 
+                                value=st.session_state.report_data.get("monitoring", ""),
+                                key="monitoring",
+                                help="How should progress be monitored and reviewed?")
+        
+        # Navigation buttons - Final section
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section"):
+                st.session_state.current_section -= 1
+                st.rerun()
+        with col2:
+            if st.button("🎯 Complete Report"):
+                st.session_state.report_data.update({
+                    "educational_provision": educational_provision,
+                    "interventions": interventions,
+                    "professional_support": professional_support,
+                    "monitoring": monitoring
+                })
+                
+                if not st.session_state.current_report_id:
+                    st.session_state.current_report_id = st.session_state.db.generate_report_id(
+                        st.session_state.report_data.get("child_name", "Unknown"), "ehc_assessment"
+                    )
+                
+                # Mark as completed
+                st.session_state.db.save_report(
+                    st.session_state.current_report_id,
+                    "ehc_assessment",
+                    st.session_state.report_data.get("child_name", "Unknown"),
+                    st.session_state.report_data,
+                    st.session_state.current_section,
+                    is_completed=True
+                )
+                
+                st.session_state.report_mode = None
+                st.success(f"🎉 Report completed and saved! ID: {st.session_state.current_report_id}")
+                st.balloons()
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_data.update({
+                    "educational_provision": educational_provision,
+                    "interventions": interventions,
+                    "professional_support": professional_support,
+                    "monitoring": monitoring
+                })
+                
+                if not st.session_state.current_report_id:
+                    st.session_state.current_report_id = st.session_state.db.generate_report_id(
+                        st.session_state.report_data.get("child_name", "Unknown"), "ehc_assessment"
+                    )
+                
+                st.session_state.db.save_report(
+                    st.session_state.current_report_id,
+                    "ehc_assessment",
+                    st.session_state.report_data.get("child_name", "Unknown"),
+                    st.session_state.report_data,
+                    st.session_state.current_section
+                )
+                
+                st.session_state.report_mode = None
+                st.success(f"Report saved! ID: {st.session_state.current_report_id}")
+                st.rerun()
+                
     elif current_section == "Background & History":
         st.write("Tell me about the child's background and developmental history:")
         st.caption("💭 *Don't worry about perfect sentences - capture what you know however works for you.*")
