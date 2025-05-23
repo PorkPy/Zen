@@ -94,21 +94,17 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# Create input area with new conversation button
-st.markdown("<br>", unsafe_allow_html=True)
+# Chat input with new conversation button next to it at the bottom
+col1, col2 = st.columns([1, 15])  # Much smaller ratio for the + button
 
-# Input area with new conversation button
-input_col1, input_col2 = st.columns([1, 4])
-
-with input_col1:
-    if st.button("💬 New Conversation", type="secondary", use_container_width=True):
+with col1:
+    if st.button("➕", help="New Conversation", type="secondary"):
         st.session_state.messages = []
-        st.session_state.mentioned_resources = []  # Clear resources too
-        # Reset the chain to clear memory
+        st.session_state.mentioned_resources = []
         st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
         st.rerun()
 
-with input_col2:
+with col2:
     # Chat input
     if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
         # Add user message to chat history
