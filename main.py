@@ -49,8 +49,24 @@ def detect_resources(text):
     
     return resources
 
-# Streamlit UI - Make title clickable for new conversation
-if st.button("Jess", type="primary", use_container_width=False, help="Click to start a new conversation"):
+# Streamlit UI - Make title clickable for new conversation with fancy styling
+st.markdown("""
+<style>
+.fancy-title {
+    font-size: 3rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #FF69B4, #FFB6C1, #DDA0DD);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+</style>
+""", unsafe_allow_html=True)
+
+if st.button("🦋 Jess", type="primary", use_container_width=False, help="Click to start a new conversation"):
     st.session_state.messages = []
     st.session_state.mentioned_resources = []
     st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
@@ -101,22 +117,26 @@ with st.sidebar:
         st.markdown("- [CBT Resources](https://www.babcp.com/)")
         st.markdown("- [Attachment Theory](https://www.attachmentparenting.org/)")
 
-# Display chat messages
+# Display chat messages with custom avatars
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
+    if message["role"] == "user":
+        with st.chat_message("user", avatar="👤"):
+            st.write(message["content"])
+    else:
+        with st.chat_message("assistant", avatar="🦋"):
+            st.write(message["content"])
 
 # Chat input (natural Streamlit position - no extra buttons!)
 if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": user_input})
         
-        # Display user message
-        with st.chat_message("user"):
+        # Display user message with custom avatar
+        with st.chat_message("user", avatar="👤"):
             st.write(user_input)
         
-        # Generate AI response
-        with st.chat_message("assistant"):
+        # Generate AI response with butterfly avatar
+        with st.chat_message("assistant", avatar="🦋"):
             with st.spinner("Jess is thinking through this with you..."):
                 final_response = st.session_state.ep_chain.run(human_input=user_input)
                 st.write(final_response)
