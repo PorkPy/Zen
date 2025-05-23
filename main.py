@@ -4,16 +4,6 @@ from chains.claude_ep_chain import create_claude_ep_chain
 # Set page config first
 st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
 
-# Load custom CSS
-def load_css():
-    with open('style.css') as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-try:
-    load_css()
-except FileNotFoundError:
-    st.warning("Style file not found - using default styling")
-
 # Set Anthropic API Key from Streamlit Secrets
 anthropic_api_key = st.secrets["ANTHROPIC_API_KEY"]
 
@@ -64,17 +54,8 @@ st.title("Jess")
 st.caption("For Educational Psychologists")
 st.write("")  # Add some spacing
 
-# Sidebar with resources and info
+# Sidebar with resources and info  
 with st.sidebar:
-    # Much more compact new conversation button
-    col1, col2, col3 = st.columns([2, 1, 1])
-    with col1:
-        if st.button("🔄 New", key="new_conv", help="Start a new conversation"):
-            st.session_state.messages = []
-            st.session_state.mentioned_resources = []
-            st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
-            st.rerun()
-    
     # About Jess in a collapsible expander to save space
     with st.expander("ℹ️ About Jess"):
         st.write("Jess provides expert EP case consultation using advanced AI. Ask about complex cases, diagnostic frameworks, interventions, and professional development.")
@@ -114,37 +95,46 @@ with st.sidebar:
         st.markdown("- [Functional Behavioral Assessment](https://www.pbis.org/topics/functional-behavioral-assessment)")
         st.markdown("- [CBT Resources](https://www.babcp.com/)")
         st.markdown("- [Attachment Theory](https://www.attachmentparenting.org/)")
-    
-    st.markdown("---")
 
 # Display chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# Chat input (back to normal Streamlit position at bottom)
-if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
-    # Add user message to chat history
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    
-    # Display user message
-    with st.chat_message("user"):
-        st.write(user_input)
-    
-    # Generate AI response
-    with st.chat_message("assistant"):
-        with st.spinner("Jess is thinking through this with you..."):
-            final_response = st.session_state.ep_chain.run(human_input=user_input)
-            st.write(final_response)
-            
-            # Detect and add new resources
-            new_resources = detect_resources(final_response)
-            for name, link in new_resources.items():
-                if name not in [r["name"] for r in st.session_state.mentioned_resources]:
-                    st.session_state.mentioned_resources.append({"name": name, "link": link})
-    
-    # Add AI response to chat history
-    st.session_state.messages.append({"role": "assistant", "content": final_response})
+# Chat input with small new conversation button next to it
+col1, col2 = st.columns([1, 20])  # Very small button, large chat input
+
+with col1:
+    if st.button("🔄", help="New conversation", key="new_conv_bottom"):
+        st.session_state.messages = []
+        st.session_state.mentioned_resources = []
+        st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
+        st.rerun()
+
+with col2:
+    # Chat input (stays in its natural Streamlit position)
+    if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        
+        # Display user message
+        with st.chat_message("user"):
+            st.write(user_input)
+        
+        # Generate AI response
+        with st.chat_message("assistant"):
+            with st.spinner("Jess is thinking through this with you..."):
+                final_response = st.session_state.ep_chain.run(human_input=user_input)
+                st.write(final_response)
+                
+                # Detect and add new resources
+                new_resources = detect_resources(final_response)
+                for name, link in new_resources.items():
+                    if name not in [r["name"] for r in st.session_state.mentioned_resources]:
+                        st.session_state.mentioned_resources.append({"name": name, "link": link})
+        
+        # Add AI response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": final_response})
 
 # Show recently mentioned resources below the input
 if st.session_state.mentioned_resources:
@@ -156,11 +146,3 @@ if st.session_state.mentioned_resources:
     for i, resource in enumerate(st.session_state.mentioned_resources[-6:]):  # Show last 6
         with cols[i % 2]:
             st.markdown(f"[{resource['name']}]({resource['link']})")
-
-
-# Clear chat button
-if st.sidebar.button("Clear Conversation"):
-    st.session_state.messages = []
-    st.session_state.mentioned_resources = []  # Clear resources too
-    # Reset the chain to clear memory
-    st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
