@@ -87,7 +87,7 @@ def setup_sidebar(db, anthropic_api_key):
             st.write("🐝 **Bee (User)** - busy, productive, working hard (like EPs!)")
             st.write("Both are pollinators who help things grow and flourish, just like EP work! 🌸")
         
-        st.header("📝 Report Writing")
+        st.header("📝 Reports")
         with st.expander("EHC Assessment Reports"):
             if st.button("📋 Start New EHC Report", use_container_width=True):
                 st.session_state.report_mode = "ehc_assessment"
