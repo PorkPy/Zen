@@ -4,17 +4,15 @@ from chains.claude_ep_chain import create_claude_ep_chain
 # Set page config first
 st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
 
-# Custom CSS to reduce sidebar button spacing
-st.markdown("""
-<style>
-    .stSidebar .stButton {
-        margin-bottom: 0.5rem !important;
-    }
-    .stSidebar > div:first-child {
-        padding-top: 1rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Load custom CSS
+def load_css():
+    with open('style.css') as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+try:
+    load_css()
+except FileNotFoundError:
+    st.warning("Style file not found - using default styling")
 
 # Set Anthropic API Key from Streamlit Secrets
 anthropic_api_key = st.secrets["ANTHROPIC_API_KEY"]
@@ -68,21 +66,23 @@ st.write("")  # Add some spacing
 
 # Sidebar with resources and info
 with st.sidebar:
-    # New conversation button at the top - compact spacing
-    if st.button("💬 New Conversation", type="secondary", use_container_width=True):
-        st.session_state.messages = []
-        st.session_state.mentioned_resources = []
-        st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
-        st.rerun()
+    # Compact new conversation button - smaller and positioned better
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        if st.button("💬 New", type="secondary", use_container_width=True, help="Start a new conversation"):
+            st.session_state.messages = []
+            st.session_state.mentioned_resources = []
+            st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
+            st.rerun()
     
-    # About Jess - moved to top with minimal spacing
-    st.header("ℹ️ About Jess")
-    st.write("Jess provides expert EP case consultation using advanced AI. Ask about complex cases, diagnostic frameworks, interventions, and professional development.")
-    
-    st.write("**How to use:**")
-    st.write("• Describe cases naturally - Jess will ask probing questions")
-    st.write("• Reference cultural, developmental, and systemic factors") 
-    st.write("• Request specific assessments, frameworks, or evidence")
+    # About Jess in a collapsible expander to save space
+    with st.expander("ℹ️ About Jess"):
+        st.write("Jess provides expert EP case consultation using advanced AI. Ask about complex cases, diagnostic frameworks, interventions, and professional development.")
+        
+        st.write("**How to use:**")
+        st.write("• Describe cases naturally - Jess will ask probing questions")
+        st.write("• Reference cultural, developmental, and systemic factors") 
+        st.write("• Request specific assessments, frameworks, or evidence")
     
     st.markdown("---")
     
