@@ -1,6 +1,6 @@
 import streamlit as st
 from chains.claude_ep_chain import create_claude_ep_chain
-from database.db_manager import ReportDatabase
+from db_manager import ReportDatabase
 
 # Set page config first
 st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
