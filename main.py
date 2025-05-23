@@ -59,6 +59,14 @@ if "messages" not in st.session_state:
 if "mentioned_resources" not in st.session_state:
     st.session_state.mentioned_resources = []
 
+# Initialize report writing state
+if "report_mode" not in st.session_state:
+    st.session_state.report_mode = None
+if "report_data" not in st.session_state:
+    st.session_state.report_data = {}
+if "current_section" not in st.session_state:
+    st.session_state.current_section = 0
+
 # Resource detection function
 def detect_resources(text):
     """Detect mentioned EP resources in text and return relevant links"""
@@ -149,42 +157,100 @@ with st.sidebar:
         st.markdown("- [Functional Behavioral Assessment](https://www.pbis.org/topics/functional-behavioral-assessment)")
         st.markdown("- [CBT Resources](https://www.babcp.com/)")
         st.markdown("- [Attachment Theory](https://www.attachmentparenting.org/)")
+    
+    st.header("📝 Report Writing")
+    with st.expander("EHC Assessment Reports"):
+        if st.button("📋 Start EHC Assessment Report", use_container_width=True):
+            st.session_state.report_mode = "ehc_assessment"
+            st.session_state.report_data = {}
+            st.session_state.current_section = 0
+            st.rerun()
 
-# Display chat messages with nature-themed avatars
-for message in st.session_state.messages:
-    if message["role"] == "user":
+# Main content area - check if in report mode
+if st.session_state.report_mode == "ehc_assessment":
+    # EHC Assessment Report Writing Mode
+    st.markdown("### 📋 EHC Assessment Report")
+    st.write("I'll guide you through writing an EHC Assessment Report with structured questions.")
+    
+    # Report sections
+    ehc_sections = [
+        "Child Information & Referral",
+        "Background & History", 
+        "Assessment Methods & Observations",
+        "Cognitive Assessment",
+        "Educational Attainment",
+        "Social, Emotional & Behavioral Factors",
+        "Psychological Formulation",
+        "Recommendations & Provision"
+    ]
+    
+    # Progress indicator
+    progress = (st.session_state.current_section + 1) / len(ehc_sections)
+    st.progress(progress)
+    st.write(f"Section {st.session_state.current_section + 1} of {len(ehc_sections)}: **{ehc_sections[st.session_state.current_section]}**")
+    
+    # Section-specific questions
+    current_section = ehc_sections[st.session_state.current_section]
+    
+    if current_section == "Child Information & Referral":
+        st.write("Let's start with basic information about the child and referral:")
+        name = st.text_input("Child's name (or initials):", key="child_name")
+        age = st.text_input("Age and date of birth:", key="child_age")
+        school = st.text_input("School/setting:", key="child_school")
+        referral_reason = st.text_area("Reason for referral:", key="referral_reason")
+        
+        if st.button("Next Section →"):
+            st.session_state.report_data.update({
+                "child_name": name,
+                "child_age": age, 
+                "child_school": school,
+                "referral_reason": referral_reason
+            })
+            st.session_state.current_section += 1
+            st.rerun()
+    
+    # Exit report mode
+    if st.button("← Back to Consultation Mode"):
+        st.session_state.report_mode = None
+        st.rerun()
+
+else:
+    # Normal consultation mode
+    # Display chat messages with nature-themed avatars
+    for message in st.session_state.messages:
+        if message["role"] == "user":
+            with st.chat_message("user", avatar="🐝"):
+                st.write(message["content"])
+        else:
+            with st.chat_message("assistant", avatar="🦋"):
+                st.write(message["content"])
+
+    # Chat input (natural Streamlit position - no extra buttons!)
+    if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        
+        # Display user message with bee avatar
         with st.chat_message("user", avatar="🐝"):
-            st.write(message["content"])
-    else:
+            st.write(user_input)
+        
+        # Generate AI response with butterfly avatar
         with st.chat_message("assistant", avatar="🦋"):
-            st.write(message["content"])
+            with st.spinner("Jess is thinking through this with you..."):
+                final_response = st.session_state.ep_chain.run(human_input=user_input)
+                st.write(final_response)
+                
+                # Detect and add new resources
+                new_resources = detect_resources(final_response)
+                for name, link in new_resources.items():
+                    if name not in [r["name"] for r in st.session_state.mentioned_resources]:
+                        st.session_state.mentioned_resources.append({"name": name, "link": link})
+        
+        # Add AI response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": final_response})
 
-# Chat input (natural Streamlit position - no extra buttons!)
-if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
-    # Add user message to chat history
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    
-    # Display user message with bee avatar
-    with st.chat_message("user", avatar="🐝"):
-        st.write(user_input)
-    
-    # Generate AI response with butterfly avatar
-    with st.chat_message("assistant", avatar="🦋"):
-        with st.spinner("Jess is thinking through this with you..."):
-            final_response = st.session_state.ep_chain.run(human_input=user_input)
-            st.write(final_response)
-            
-            # Detect and add new resources
-            new_resources = detect_resources(final_response)
-            for name, link in new_resources.items():
-                if name not in [r["name"] for r in st.session_state.mentioned_resources]:
-                    st.session_state.mentioned_resources.append({"name": name, "link": link})
-    
-    # Add AI response to chat history
-    st.session_state.messages.append({"role": "assistant", "content": final_response})
-
-# Show recently mentioned resources below the input
-if st.session_state.mentioned_resources:
+# Show recently mentioned resources below the input (only in consultation mode)
+if st.session_state.report_mode is None and st.session_state.mentioned_resources:
     st.markdown("---")
     st.subheader("📎 Resources mentioned in this conversation")
     
