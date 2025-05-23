@@ -56,6 +56,15 @@ st.write("")  # Add some spacing
 
 # Sidebar with resources and info
 with st.sidebar:
+    # New conversation button at the top - prominent and easy to find
+    if st.button("💬 New Conversation", type="secondary", use_container_width=True):
+        st.session_state.messages = []
+        st.session_state.mentioned_resources = []
+        st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
+        st.rerun()
+    
+    st.markdown("---")
+    
     st.header("📚 Professional Bodies")
     with st.expander("UK Organizations", expanded=False):
         st.markdown("[BPS Division of Educational Psychology](https://www.bps.org.uk/divisions/educational-psychology)")
@@ -66,6 +75,16 @@ with st.sidebar:
         st.markdown("[SEND Code of Practice](https://www.gov.uk/government/publications/send-code-of-practice-0-to-25)")
         st.markdown("[NICE Guidelines](https://www.nice.org.uk/)")
         st.markdown("[Mental Capacity Act](https://www.legislation.gov.uk/ukpga/2005/9/contents)")
+    
+    with st.expander("Derby City Council", expanded=False):
+        st.markdown("[Derby SEND Local Offer](https://www.derby.gov.uk/education-and-learning/special-educational-needs/)")
+        st.markdown("[Derby Education Services](https://www.derby.gov.uk/education-and-learning/)")
+        st.markdown("[Derby SEND Information](https://www.derby.gov.uk/education-and-learning/special-educational-needs/send-information-report/)")
+    
+    with st.expander("Special Schools & Placements", expanded=False):
+        st.markdown("[Independent Schools Council](https://www.isc.co.uk/)")
+        st.markdown("[National Association of Special Schools](https://www.nasschools.org.uk/)")
+        st.markdown("[IPSEA - Independent Panel for Special Education Advice](https://www.ipsea.org.uk/)")
     
     with st.expander("Assessment Tools", expanded=False):
         st.markdown("[Sensory Profile-2 Info](https://www.pearsonassessments.com/store/usassessments/en/Store/Professional-Assessments/Behavior/Sensory-Profile-2/p/100000822.html)")
@@ -94,40 +113,29 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# Chat input with new conversation button next to it at the bottom
-col1, col2 = st.columns([1, 15])  # Much smaller ratio for the + button
-
-with col1:
-    if st.button("➕", help="New Conversation", type="secondary"):
-        st.session_state.messages = []
-        st.session_state.mentioned_resources = []
-        st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
-        st.rerun()
-
-with col2:
-    # Chat input
-    if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        
-        # Display user message
-        with st.chat_message("user"):
-            st.write(user_input)
-        
-        # Generate AI response
-        with st.chat_message("assistant"):
-            with st.spinner("Jess is thinking through this with you..."):
-                final_response = st.session_state.ep_chain.run(human_input=user_input)
-                st.write(final_response)
-                
-                # Detect and add new resources
-                new_resources = detect_resources(final_response)
-                for name, link in new_resources.items():
-                    if name not in [r["name"] for r in st.session_state.mentioned_resources]:
-                        st.session_state.mentioned_resources.append({"name": name, "link": link})
-        
-        # Add AI response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": final_response})
+# Chat input (back to normal Streamlit position at bottom)
+if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    
+    # Display user message
+    with st.chat_message("user"):
+        st.write(user_input)
+    
+    # Generate AI response
+    with st.chat_message("assistant"):
+        with st.spinner("Jess is thinking through this with you..."):
+            final_response = st.session_state.ep_chain.run(human_input=user_input)
+            st.write(final_response)
+            
+            # Detect and add new resources
+            new_resources = detect_resources(final_response)
+            for name, link in new_resources.items():
+                if name not in [r["name"] for r in st.session_state.mentioned_resources]:
+                    st.session_state.mentioned_resources.append({"name": name, "link": link})
+    
+    # Add AI response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": final_response})
 
 # Show recently mentioned resources below the input
 if st.session_state.mentioned_resources:
