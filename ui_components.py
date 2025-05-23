@@ -135,14 +135,14 @@ def setup_sidebar(db, anthropic_api_key):
             if recent_reports:
                 for report in recent_reports:
                     status = "✅ Complete" if report["is_completed"] else "🔄 In Progress"
-                    col1, col2 = st.columns([3, 1])
+                    col1, col2 = st.columns([2.5, 1])
                     
                     with col1:
                         st.write(f"{report['child_name']} - {status}")
                         st.caption(f"Updated: {report['updated_at'][:16]} | ID: {report['id']}")
                     
                     with col2:
-                        if st.button("📖 Load", key=f"load_{report['id']}", help="Continue this report"):
+                        if st.button("📖", key=f"load_{report['id']}", help="Load and continue this report", use_container_width=True):
                             # Load the report
                             loaded_report = db.load_report(report['id'])
                             if loaded_report:
