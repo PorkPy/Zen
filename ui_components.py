@@ -87,37 +87,6 @@ def setup_sidebar(db, anthropic_api_key):
             st.write("🐝 **Bee (User)** - busy, productive, working hard (like EPs!)")
             st.write("Both are pollinators who help things grow and flourish, just like EP work! 🌸")
         
-        st.header("📚 Professional Bodies")
-        with st.expander("UK Organizations"):
-            st.markdown("- [BPS Division of Educational & Child Psychology](https://www.bps.org.uk/member-networks/division-educational-and-child-psychology)")
-            st.markdown("- [Association of Educational Psychologists](https://www.aep.org.uk/)")
-        
-        st.header("📋 Key Resources")
-        with st.expander("Legislation & Guidelines"):
-            st.markdown("- [SEND Code of Practice](https://www.gov.uk/government/publications/send-code-of-practice-0-to-25)")
-            st.markdown("- [NICE Guidelines](https://www.nice.org.uk/)")
-            st.markdown("- [Mental Capacity Act](https://www.legislation.gov.uk/ukpga/2005/9/contents)")
-        
-        with st.expander("Derby City Council"):
-            st.markdown("- [Derby's SEND Local Offer](https://www.derby.gov.uk/education-and-learning/derbys-send-local-offer/)")
-            st.markdown("- [Derby SEND Strategy](https://www.derby.gov.uk/education-and-learning/derbys-send-local-offer/send-inclusion-derby/our-send-strategy/)")
-            st.markdown("- [Choosing Schools with SEND](https://www.derby.gov.uk/education-and-learning/derbys-send-local-offer/education/choosing-a-school-for-a-child-with-send/)")
-        
-        with st.expander("Special Schools & Placements"):
-            st.markdown("- [Independent Schools Council](https://www.isc.co.uk/)")
-            st.markdown("- [National Association of Special Schools](https://www.nasschools.org.uk/)")
-            st.markdown("- [IPSEA - Legal Advice](https://www.ipsea.org.uk/)")
-        
-        with st.expander("Assessment Tools"):
-            st.markdown("- [Sensory Profile-2](https://www.pearsonassessments.com/store/usassessments/en/Store/Professional-Assessments/Behavior/Sensory-Profile-2/p/100000822.html)")
-            st.markdown("- [ADOS-2 Overview](https://www.ados-2.com/)")
-            st.markdown("- [WISC-V Information](https://www.pearsonassessments.com/store/usassessments/en/Store/Professional-Assessments/Cognition-%26-Neuro/Wechsler-Intelligence-Scale-for-Children-%7C-Fifth-Edition/p/100000771.html)")
-        
-        with st.expander("Frameworks & Interventions"):
-            st.markdown("- [Functional Behavioral Assessment](https://www.pbis.org/topics/functional-behavioral-assessment)")
-            st.markdown("- [CBT Resources](https://www.babcp.com/)")
-            st.markdown("- [Attachment Theory](https://www.attachmentparenting.org/)")
-        
         st.header("📝 Report Writing")
         with st.expander("EHC Assessment Reports"):
             if st.button("📋 Start New EHC Report", use_container_width=True):
@@ -154,3 +123,34 @@ def setup_sidebar(db, anthropic_api_key):
                                 st.rerun()
             else:
                 st.caption("No saved reports yet")
+        
+        st.header("📚 Professional Bodies")
+        with st.expander("UK Organizations"):
+            st.markdown("- [BPS Division of Educational & Child Psychology](https://www.bps.org.uk/member-networks/division-educational-and-child-psychology)")
+            st.markdown("- [Association of Educational Psychologists](https://www.aep.org.uk/)")
+        
+        st.header("📋 Key Resources")
+        with st.expander("Legislation & Guidelines"):
+            st.markdown("- [SEND Code of Practice](https://www.gov.uk/government/publications/send-code-of-practice-0-to-25)")
+            st.markdown("- [NICE Guidelines](https://www.nice.org.uk/)")
+            st.markdown("- [Mental Capacity Act](https://www.legislation.gov.uk/ukpga/2005/9/contents)")
+        
+        with st.expander("Derby City Council"):
+            st.markdown("- [Derby's SEND Local Offer](https://www.derby.gov.uk/education-and-learning/derbys-send-local-offer/)")
+            st.markdown("- [Derby SEND Strategy](https://www.derby.gov.uk/education-and-learning/derbys-send-local-offer/send-inclusion-derby/our-send-strategy/)")
+            st.markdown("- [Choosing Schools with SEND](https://www.derby.gov.uk/education-and-learning/derbys-send-local-offer/education/choosing-a-school-for-a-child-with-send/)")
+        
+        with st.expander("Special Schools & Placements"):
+            st.markdown("- [Independent Schools Council](https://www.isc.co.uk/)")
+            st.markdown("- [National Association of Special Schools](https://www.nasschools.org.uk/)")
+            st.markdown("- [IPSEA - Legal Advice](https://www.ipsea.org.uk/)")
+        
+        with st.expander("Assessment Tools"):
+            st.markdown("- [Sensory Profile-2](https://www.pearsonassessments.com/store/usassessments/en/Store/Professional-Assessments/Behavior/Sensory-Profile-2/p/100000822.html)")
+            st.markdown("- [ADOS-2 Overview](https://www.ados-2.com/)")
+            st.markdown("- [WISC-V Information](https://www.pearsonassessments.com/store/usassessments/en/Store/Professional-Assessments/Cognition-%26-Neuro/Wechsler-Intelligence-Scale-for-Children-%7C-Fifth-Edition/p/100000771.html)")
+        
+        with st.expander("Frameworks & Interventions"):
+            st.markdown("- [Functional Behavioral Assessment](https://www.pbis.org/topics/functional-behavioral-assessment)")
+            st.markdown("- [CBT Resources](https://www.babcp.com/)")
+            st.markdown("- [Attachment Theory](https://www.attachmentparenting.org/)")
