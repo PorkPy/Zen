@@ -4,7 +4,7 @@ from chains.claude_ep_chain import create_claude_ep_chain
 # Set page config first
 st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
 
-# Custom CSS for fancy title and sidebar spacing fixes
+# Custom CSS for fancy title and sidebar styling
 st.markdown("""
 <style>
 .fancy-title {
@@ -32,6 +32,15 @@ st.markdown("""
 /* Make sidebar more compact overall */
 .stSidebar .element-container {
     margin-bottom: 0.5rem !important;
+}
+
+/* Style the new conversation button to match title */
+.stSidebar button[kind="primary"] {
+    background: linear-gradient(45deg, #FF69B4, #FFB6C1, #DDA0DD) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-radius: 20px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -88,21 +97,27 @@ st.write("")  # Add some spacing
 
 # Sidebar with resources and info  
 with st.sidebar:
-    # New conversation button at top with better styling
-    if st.button("🦋 New Conversation", type="primary", use_container_width=True, help="Start a new conversation"):
+    # Start fresh button at top with better styling
+    if st.button("Start Fresh", type="primary", use_container_width=True, help="Begin a new conversation"):
         st.session_state.messages = []
         st.session_state.mentioned_resources = []
         st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
         st.rerun()
     
-    # About Jess in a collapsible expander to save space
-    with st.expander("ℹ️ About Jess"):
+    # About Jess with butterfly icon and nature theme explanation
+    with st.expander("🦋 About Jess"):
         st.write("Jess provides expert EP case consultation using advanced AI. Ask about complex cases, diagnostic frameworks, interventions, and professional development.")
         
         st.write("**How to use:**")
         st.write("• Describe cases naturally - Jess will ask probing questions")
         st.write("• Reference cultural, developmental, and systemic factors") 
         st.write("• Request specific assessments, frameworks, or evidence")
+        
+        st.markdown("---")
+        st.write("**Our Nature Theme:**")
+        st.write("🦋 **Butterfly (Jess)** - transformation, growth, guidance")
+        st.write("🐝 **Bee (User)** - busy, productive, working hard (like EPs!)")
+        st.write("Both are pollinators who help things grow and flourish, just like EP work! 🌸")
     
     st.header("📚 Professional Bodies")
     with st.expander("UK Organizations"):
@@ -135,10 +150,10 @@ with st.sidebar:
         st.markdown("- [CBT Resources](https://www.babcp.com/)")
         st.markdown("- [Attachment Theory](https://www.attachmentparenting.org/)")
 
-# Display chat messages with custom avatars
+# Display chat messages with nature-themed avatars
 for message in st.session_state.messages:
     if message["role"] == "user":
-        with st.chat_message("user", avatar="👤"):
+        with st.chat_message("user", avatar="🐝"):
             st.write(message["content"])
     else:
         with st.chat_message("assistant", avatar="🦋"):
@@ -149,8 +164,8 @@ if user_input := st.chat_input("Ask Jess about EP practice, cases, or profession
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": user_input})
     
-    # Display user message with custom avatar
-    with st.chat_message("user", avatar="👤"):
+    # Display user message with bee avatar
+    with st.chat_message("user", avatar="🐝"):
         st.write(user_input)
     
     # Generate AI response with butterfly avatar
