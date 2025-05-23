@@ -80,16 +80,16 @@ def render_report_section(section_name, current_section, total_sections, report_
         
         name = st.text_input("Child's name (or initials):", 
                             value=report_data.get("child_name", ""), 
-                            key="child_name")
+                            key=f"child_name_edit_{current_section}")
         age = st.text_input("Age and date of birth:", 
                            value=report_data.get("child_age", ""), 
-                           key="child_age")
+                           key=f"child_age_edit_{current_section}")
         school = st.text_input("School/setting:", 
                               value=report_data.get("child_school", ""), 
-                              key="child_school")
+                              key=f"child_school_edit_{current_section}")
         referral_reason = st.text_area("Reason for referral:", 
                                       value=report_data.get("referral_reason", ""),
-                                      key="referral_reason", 
+                                      key=f"referral_reason_edit_{current_section}", 
                                       help="Just jot down the key concerns - bullet points are fine!")
         
         section_data = {
@@ -97,6 +97,100 @@ def render_report_section(section_name, current_section, total_sections, report_
             "child_age": age,
             "child_school": school,
             "referral_reason": referral_reason
+        }
+        
+    elif section_name == "Background & History":
+        st.write("Tell me about the child's background and developmental history:")
+        st.caption("💭 *Don't worry about perfect sentences - capture what you know however works for you.*")
+        
+        family_background = st.text_area("Family background and home circumstances:", 
+                                        value=report_data.get("family_background", ""),
+                                        key=f"family_background_edit_{current_section}",
+                                        help="Quick notes are fine - family structure, any relevant circumstances")
+        developmental_history = st.text_area("Early developmental history (milestones, concerns):", 
+                                           value=report_data.get("developmental_history", ""),
+                                           key=f"developmental_history_edit_{current_section}",
+                                           help="Any developmental info you have - bullet points work great")
+        medical_history = st.text_area("Relevant medical history:", 
+                                     value=report_data.get("medical_history", ""),
+                                     key=f"medical_history_edit_{current_section}",
+                                     help="Just note any relevant medical information")
+        previous_support = st.text_area("Previous educational support and interventions:", 
+                                      value=report_data.get("previous_support", ""),
+                                      key=f"previous_support_edit_{current_section}",
+                                      help="List what's been tried before - informal notes are perfect")
+        
+        section_data = {
+            "family_background": family_background,
+            "developmental_history": developmental_history,
+            "medical_history": medical_history,
+            "previous_support": previous_support
+        }
+        
+    elif section_name == "Assessment Methods & Observations":
+        st.write("Details about your assessment approach and observations:")
+        st.caption("💭 *Just capture your observations naturally - I'll turn them into professional report language.*")
+        
+        assessment_methods = st.text_area("Assessment methods used (tests, observations, interviews):", 
+                                        value=report_data.get("assessment_methods", ""),
+                                        key=f"assessment_methods_edit_{current_section}",
+                                        help="List what you did - WISC-V, observations, etc.")
+        classroom_observation = st.text_area("Classroom observation findings:", 
+                                           value=report_data.get("classroom_observation", ""),
+                                           key=f"classroom_observation_edit_{current_section}",
+                                           help="What did you notice? Jot down key observations")
+        child_interaction = st.text_area("Direct interaction with child - behavior and engagement:", 
+                                       value=report_data.get("child_interaction", ""),
+                                       key=f"child_interaction_edit_{current_section}",
+                                       help="How was the child during assessment? Informal notes fine")
+        child_views = st.text_area("Child's views and perspectives:", 
+                                 value=report_data.get("child_views", ""),
+                                 key=f"child_views_edit_{current_section}",
+                                 help="What did the child say? Direct quotes or paraphrasing both work")
+        
+        section_data = {
+            "assessment_methods": assessment_methods,
+            "classroom_observation": classroom_observation,
+            "child_interaction": child_interaction,
+            "child_views": child_views
+        }
+        
+    elif section_name == "Cognitive Assessment":
+        st.write("Cognitive assessment results and findings:")
+        st.caption("💭 *Record test results, observations during testing, and what they mean. Don't worry about formatting.*")
+        
+        cognitive_tests = st.text_area("Cognitive tests administered:", 
+                                     value=report_data.get("cognitive_tests", ""),
+                                     key=f"cognitive_tests_edit_{current_section}",
+                                     help="WISC-V, BPVS, etc. - just list what you used")
+        
+        cognitive_scores = st.text_area("Test scores and index scores:", 
+                                      value=report_data.get("cognitive_scores", ""),
+                                      key=f"cognitive_scores_edit_{current_section}",
+                                      help="Raw scores, standard scores, percentiles - whatever format works",
+                                      height=100)
+        
+        cognitive_strengths = st.text_area("Cognitive strengths observed:", 
+                                         value=report_data.get("cognitive_strengths", ""),
+                                         key=f"cognitive_strengths_edit_{current_section}",
+                                         help="What did the child do well? Areas of strength?")
+        
+        cognitive_difficulties = st.text_area("Areas of cognitive difficulty:", 
+                                            value=report_data.get("cognitive_difficulties", ""),
+                                            key=f"cognitive_difficulties_edit_{current_section}",
+                                            help="Where did they struggle? What patterns emerged?")
+        
+        testing_behavior = st.text_area("Behavior and approach during testing:", 
+                                      value=report_data.get("testing_behavior", ""),
+                                      key=f"testing_behavior_edit_{current_section}",
+                                      help="How did they engage? Any factors affecting performance?")
+        
+        section_data = {
+            "cognitive_tests": cognitive_tests,
+            "cognitive_scores": cognitive_scores,
+            "cognitive_strengths": cognitive_strengths,
+            "cognitive_difficulties": cognitive_difficulties,
+            "testing_behavior": testing_behavior
         }
         
     elif section_name == "Background & History":
@@ -199,22 +293,22 @@ def render_report_section(section_name, current_section, total_sections, report_
         
         academic_levels = st.text_area("Current academic levels and attainment:", 
                                      value=report_data.get("academic_levels", ""),
-                                     key="academic_levels",
+                                     key=f"academic_levels_edit_{current_section}",
                                      help="Reading age, maths levels, National Curriculum levels, etc.")
         
         curriculum_access = st.text_area("Access to curriculum and learning:", 
                                         value=report_data.get("curriculum_access", ""),
-                                        key="curriculum_access",
+                                        key=f"curriculum_access_edit_{current_section}",
                                         help="How well can they access mainstream curriculum?")
         
         academic_strengths = st.text_area("Academic strengths and interests:", 
                                         value=report_data.get("academic_strengths", ""),
-                                        key="academic_strengths",
+                                        key=f"academic_strengths_edit_{current_section}",
                                         help="What subjects/areas does the child excel in?")
         
         learning_barriers = st.text_area("Barriers to learning and progress:", 
                                         value=report_data.get("learning_barriers", ""),
-                                        key="learning_barriers",
+                                        key=f"learning_barriers_edit_{current_section}",
                                         help="What's preventing optimal academic progress?")
         
         section_data = {
@@ -230,22 +324,22 @@ def render_report_section(section_name, current_section, total_sections, report_
         
         social_skills = st.text_area("Social skills and peer relationships:", 
                                    value=report_data.get("social_skills", ""),
-                                   key="social_skills",
+                                   key=f"social_skills_edit_{current_section}",
                                    help="How does the child interact with peers and adults?")
         
         emotional_regulation = st.text_area("Emotional development and regulation:", 
                                           value=report_data.get("emotional_regulation", ""),
-                                          key="emotional_regulation",
+                                          key=f"emotional_regulation_edit_{current_section}",
                                           help="How does the child manage emotions and stress?")
         
         behavioral_patterns = st.text_area("Behavioral observations and patterns:", 
                                          value=report_data.get("behavioral_patterns", ""),
-                                         key="behavioral_patterns",
+                                         key=f"behavioral_patterns_edit_{current_section}",
                                          help="Any concerning or notable behavioral patterns?")
         
         self_esteem = st.text_area("Self-esteem and confidence:", 
                                  value=report_data.get("self_esteem", ""),
-                                 key="self_esteem",
+                                 key=f"self_esteem_edit_{current_section}",
                                  help="How does the child view themselves and their abilities?")
         
         section_data = {
@@ -261,18 +355,18 @@ def render_report_section(section_name, current_section, total_sections, report_
         
         formulation = st.text_area("Psychological formulation:", 
                                  value=report_data.get("formulation", ""),
-                                 key="formulation",
+                                 key=f"formulation_edit_{current_section}",
                                  help="Your professional analysis of what's happening for this child",
                                  height=150)
         
         contributing_factors = st.text_area("Contributing factors and underlying causes:", 
                                           value=report_data.get("contributing_factors", ""),
-                                          key="contributing_factors",
+                                          key=f"contributing_factors_edit_{current_section}",
                                           help="What factors are contributing to the child's difficulties?")
         
         prognosis = st.text_area("Prognosis and future considerations:", 
                                 value=report_data.get("prognosis", ""),
-                                key="prognosis",
+                                key=f"prognosis_edit_{current_section}",
                                 help="What's the outlook? What should be considered going forward?")
         
         section_data = {
@@ -287,24 +381,24 @@ def render_report_section(section_name, current_section, total_sections, report_
         
         educational_provision = st.text_area("Educational provision recommendations:", 
                                             value=report_data.get("educational_provision", ""),
-                                            key="educational_provision",
+                                            key=f"educational_provision_edit_{current_section}",
                                             help="What educational support/placement is needed?",
                                             height=120)
         
         interventions = st.text_area("Specific interventions and strategies:", 
                                    value=report_data.get("interventions", ""),
-                                   key="interventions",
+                                   key=f"interventions_edit_{current_section}",
                                    help="What specific interventions should be implemented?",
                                    height=120)
         
         professional_support = st.text_area("Professional support required:", 
                                            value=report_data.get("professional_support", ""),
-                                           key="professional_support",
+                                           key=f"professional_support_edit_{current_section}",
                                            help="What other professionals need to be involved?")
         
         monitoring = st.text_area("Review and monitoring arrangements:", 
                                 value=report_data.get("monitoring", ""),
-                                key="monitoring",
+                                key=f"monitoring_edit_{current_section}",
                                 help="How should progress be monitored and reviewed?")
         
         section_data = {
