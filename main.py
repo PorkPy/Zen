@@ -4,6 +4,23 @@ from chains.claude_ep_chain import create_claude_ep_chain
 # Set page config first
 st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
 
+# Custom CSS for fancy title
+st.markdown("""
+<style>
+.fancy-title {
+    font-size: 3rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #FF69B4, #FFB6C1, #DDA0DD);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Set Anthropic API Key from Streamlit Secrets
 anthropic_api_key = st.secrets["ANTHROPIC_API_KEY"]
 
@@ -49,23 +66,7 @@ def detect_resources(text):
     
     return resources
 
-# Streamlit UI - Make title clickable for new conversation with fancy styling
-st.markdown("""
-<style>
-.fancy-title {
-    font-size: 3rem;
-    font-weight: bold;
-    background: linear-gradient(45deg, #FF69B4, #FFB6C1, #DDA0DD);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-align: center;
-    margin-bottom: 0;
-    cursor: pointer;
-}
-</style>
-""", unsafe_allow_html=True)
-
+# Streamlit UI - Fancy clickable title with butterfly
 if st.button("🦋 Jess", type="primary", use_container_width=False, help="Click to start a new conversation"):
     st.session_state.messages = []
     st.session_state.mentioned_resources = []
@@ -128,27 +129,27 @@ for message in st.session_state.messages:
 
 # Chat input (natural Streamlit position - no extra buttons!)
 if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        
-        # Display user message with custom avatar
-        with st.chat_message("user", avatar="👤"):
-            st.write(user_input)
-        
-        # Generate AI response with butterfly avatar
-        with st.chat_message("assistant", avatar="🦋"):
-            with st.spinner("Jess is thinking through this with you..."):
-                final_response = st.session_state.ep_chain.run(human_input=user_input)
-                st.write(final_response)
-                
-                # Detect and add new resources
-                new_resources = detect_resources(final_response)
-                for name, link in new_resources.items():
-                    if name not in [r["name"] for r in st.session_state.mentioned_resources]:
-                        st.session_state.mentioned_resources.append({"name": name, "link": link})
-        
-        # Add AI response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": final_response})
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    
+    # Display user message with custom avatar
+    with st.chat_message("user", avatar="👤"):
+        st.write(user_input)
+    
+    # Generate AI response with butterfly avatar
+    with st.chat_message("assistant", avatar="🦋"):
+        with st.spinner("Jess is thinking through this with you..."):
+            final_response = st.session_state.ep_chain.run(human_input=user_input)
+            st.write(final_response)
+            
+            # Detect and add new resources
+            new_resources = detect_resources(final_response)
+            for name, link in new_resources.items():
+                if name not in [r["name"] for r in st.session_state.mentioned_resources]:
+                    st.session_state.mentioned_resources.append({"name": name, "link": link})
+    
+    # Add AI response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": final_response})
 
 # Show recently mentioned resources below the input
 if st.session_state.mentioned_resources:
