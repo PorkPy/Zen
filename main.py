@@ -4,6 +4,18 @@ from chains.claude_ep_chain import create_claude_ep_chain
 # Set page config first
 st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
 
+# Custom CSS to reduce sidebar button spacing
+st.markdown("""
+<style>
+    .stSidebar .stButton {
+        margin-bottom: 0.5rem !important;
+    }
+    .stSidebar > div:first-child {
+        padding-top: 1rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Set Anthropic API Key from Streamlit Secrets
 anthropic_api_key = st.secrets["ANTHROPIC_API_KEY"]
 
@@ -56,16 +68,14 @@ st.write("")  # Add some spacing
 
 # Sidebar with resources and info
 with st.sidebar:
-    # New conversation button at the top - prominent and easy to find
+    # New conversation button at the top - compact spacing
     if st.button("💬 New Conversation", type="secondary", use_container_width=True):
         st.session_state.messages = []
         st.session_state.mentioned_resources = []
         st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
         st.rerun()
     
-    st.markdown("---")
-    
-    # About Jess moved to top
+    # About Jess - moved to top with minimal spacing
     st.header("ℹ️ About Jess")
     st.write("Jess provides expert EP case consultation using advanced AI. Ask about complex cases, diagnostic frameworks, interventions, and professional development.")
     
