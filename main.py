@@ -260,8 +260,31 @@ if st.session_state.report_mode == "ehc_assessment":
                 st.rerun()
         with col3:
             if st.button("💾 Save & Exit"):
+                # Auto-save current section data
+                st.session_state.report_data.update({
+                    "child_name": name,
+                    "child_age": age, 
+                    "child_school": school,
+                    "referral_reason": referral_reason
+                })
+                
+                # Generate or use existing report ID
+                if not st.session_state.current_report_id:
+                    st.session_state.current_report_id = st.session_state.db.generate_report_id(
+                        name or "Unknown", "ehc_assessment"
+                    )
+                
+                # Save to database
+                st.session_state.db.save_report(
+                    st.session_state.current_report_id,
+                    "ehc_assessment",
+                    name or "Unknown",
+                    st.session_state.report_data,
+                    st.session_state.current_section
+                )
+                
                 st.session_state.report_mode = None
-                st.success("Report progress saved! You can continue later.")
+                st.success(f"Report saved! ID: {st.session_state.current_report_id}")
                 st.rerun()
                 
     elif current_section == "Background & History":
