@@ -4,7 +4,7 @@ from chains.claude_ep_chain import create_claude_ep_chain
 # Set page config first
 st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
 
-# Custom CSS for fancy title
+# Custom CSS for fancy title and sidebar spacing fixes
 st.markdown("""
 <style>
 .fancy-title {
@@ -17,6 +17,21 @@ st.markdown("""
     text-align: center;
     margin-bottom: 0;
     cursor: pointer;
+}
+
+/* Fix excessive white space in sidebar */
+.stSidebar > div:first-child {
+    padding-top: 1rem !important;
+}
+
+.stSidebar .stButton {
+    margin-bottom: 0.5rem !important;
+    margin-top: 0 !important;
+}
+
+/* Make sidebar more compact overall */
+.stSidebar .element-container {
+    margin-bottom: 0.5rem !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -66,18 +81,20 @@ def detect_resources(text):
     
     return resources
 
-# Streamlit UI - Fancy clickable title with butterfly
-if st.button("🦋 Jess", type="primary", use_container_width=False, help="Click to start a new conversation"):
-    st.session_state.messages = []
-    st.session_state.mentioned_resources = []
-    st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
-    st.rerun()
-
+# Streamlit UI - Clean title without button functionality (button now in sidebar)
+st.markdown('<h1 class="fancy-title">🦋 Jess</h1>', unsafe_allow_html=True)
 st.caption("For Educational Psychologists")
 st.write("")  # Add some spacing
 
 # Sidebar with resources and info  
 with st.sidebar:
+    # New conversation button at top with better styling
+    if st.button("🦋 New Conversation", type="primary", use_container_width=True, help="Start a new conversation"):
+        st.session_state.messages = []
+        st.session_state.mentioned_resources = []
+        st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
+        st.rerun()
+    
     # About Jess in a collapsible expander to save space
     with st.expander("ℹ️ About Jess"):
         st.write("Jess provides expert EP case consultation using advanced AI. Ask about complex cases, diagnostic frameworks, interventions, and professional development.")
