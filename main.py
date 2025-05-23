@@ -199,19 +199,34 @@ if st.session_state.report_mode == "ehc_assessment":
         school = st.text_input("School/setting:", key="child_school")
         referral_reason = st.text_area("Reason for referral:", key="referral_reason")
         
-        if st.button("Next Section →"):
-            st.session_state.report_data.update({
-                "child_name": name,
-                "child_age": age, 
-                "child_school": school,
-                "referral_reason": referral_reason
-            })
-            st.session_state.current_section += 1
-            st.rerun()
+        # Navigation buttons
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section", disabled=True):  # Disabled on first section
+                pass
+        with col2:
+            if st.button("Next Section →"):
+                st.session_state.report_data.update({
+                    "child_name": name,
+                    "child_age": age, 
+                    "child_school": school,
+                    "referral_reason": referral_reason
+                })
+                st.session_state.current_section += 1
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_mode = None
+                st.success("Report progress saved! You can continue later.")
+                st.rerun()
     
-    # Exit report mode
-    if st.button("← Back to Consultation Mode"):
+    # Add spacing before exit button
+    st.markdown("---")
+    st.write("**Report Controls:**")
+    if st.button("🚪 Exit Report (without saving)", type="secondary"):
         st.session_state.report_mode = None
+        st.session_state.report_data = {}
+        st.session_state.current_section = 0
         st.rerun()
 
 else:
