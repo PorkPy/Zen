@@ -3,7 +3,11 @@ from chains.claude_ep_chain import create_claude_ep_chain
 
 def setup_page_config():
     """Set up page configuration and custom CSS"""
-    st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
+    st.set_page_config(
+        page_title="Jess - For Educational Psychologists", 
+        page_icon="🦋",  # Butterfly matches Jess's theme perfectly
+        layout="wide"
+    )
     
     # Custom CSS for fancy title and sidebar styling
     st.markdown("""
