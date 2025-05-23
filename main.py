@@ -67,7 +67,7 @@ with st.sidebar:
     
     st.header("📚 Professional Bodies")
     with st.expander("UK Organizations", expanded=False):
-        st.markdown("[BPS Division of Educational Psychology](https://www.bps.org.uk/divisions/educational-psychology)")
+        st.markdown("[BPS Division of Educational & Child Psychology](https://www.bps.org.uk/member-networks/division-educational-and-child-psychology)")
         st.markdown("[Association of Educational Psychologists](https://www.aep.org.uk/)")
     
     st.header("📋 Key Resources")
@@ -77,9 +77,10 @@ with st.sidebar:
         st.markdown("[Mental Capacity Act](https://www.legislation.gov.uk/ukpga/2005/9/contents)")
     
     with st.expander("Derby City Council", expanded=False):
-        st.markdown("[Derby SEND Local Offer](https://www.derby.gov.uk/education-and-learning/special-educational-needs/)")
-        st.markdown("[Derby Education Services](https://www.derby.gov.uk/education-and-learning/)")
-        st.markdown("[Derby SEND Information](https://www.derby.gov.uk/education-and-learning/special-educational-needs/send-information-report/)")
+        st.markdown("[Derby's SEND Local Offer](https://www.derby.gov.uk/education-and-learning/derbys-send-local-offer/)")
+        st.markdown("[Derby SEND Strategy](https://www.derby.gov.uk/education-and-learning/derbys-send-local-offer/send-inclusion-derby/our-send-strategy/)")
+        st.markdown("[Choosing Schools with SEND](https://www.derby.gov.uk/education-and-learning/derbys-send-local-offer/education/choosing-a-school-for-a-child-with-send/)")
+        st.markdown("[Derby School Admissions](https://www.derby.gov.uk/education-and-learning/schools-and-colleges/school-admissions/)")
     
     with st.expander("Special Schools & Placements", expanded=False):
         st.markdown("[Independent Schools Council](https://www.isc.co.uk/)")
