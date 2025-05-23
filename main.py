@@ -4,6 +4,7 @@ from db_manager import ReportDatabase
 from report_generator import generate_professional_report
 from report_sections import render_report_section
 from ui_components import setup_page_config, setup_sidebar
+from document_export import create_word_document, create_rich_text_document
 
 # Set page config and styling
 setup_page_config()
@@ -119,13 +120,29 @@ if st.session_state.report_mode == "ehc_assessment":
                 st.rerun()
         
         with col3:
-            # Download button
-            st.download_button(
-                label="📥 Download Report",
-                data=st.session_state.generated_report,
-                file_name=f"EHC_Report_{st.session_state.report_data.get('child_name', 'Unknown')}_{st.session_state.current_report_id}.txt",
-                mime="text/plain"
-            )
+            # Download button - try Word format first, fallback to RTF
+            child_name = st.session_state.report_data.get('child_name', 'Unknown')
+            report_id = st.session_state.current_report_id
+            
+            # Try to create Word document
+            word_doc = create_word_document(st.session_state.generated_report, child_name, report_id)
+            
+            if word_doc:
+                st.download_button(
+                    label="📥 Download Report (.docx)",
+                    data=word_doc,
+                    file_name=f"EHC_Report_{child_name}_{report_id}.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
+            else:
+                # Fallback to RTF format
+                rtf_doc = create_rich_text_document(st.session_state.generated_report, child_name, report_id)
+                st.download_button(
+                    label="📥 Download Report (.rtf)",
+                    data=rtf_doc,
+                    file_name=f"EHC_Report_{child_name}_{report_id}.rtf",
+                    mime="application/rtf"
+                )
         
         with col4:
             if st.button("🏠 Back to Main"):
