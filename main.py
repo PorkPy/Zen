@@ -1,5 +1,6 @@
 import streamlit as st
 from chains.claude_ep_chain import create_claude_ep_chain
+from database.db_manager import ReportDatabase
 
 # Set page config first
 st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
@@ -52,6 +53,10 @@ anthropic_api_key = st.secrets["ANTHROPIC_API_KEY"]
 if "ep_chain" not in st.session_state:
     st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
 
+# Initialize database
+if "db" not in st.session_state:
+    st.session_state.db = ReportDatabase()
+
 # Initialize message history and resources in session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -66,6 +71,8 @@ if "report_data" not in st.session_state:
     st.session_state.report_data = {}
 if "current_section" not in st.session_state:
     st.session_state.current_section = 0
+if "current_report_id" not in st.session_state:
+    st.session_state.current_report_id = None
 
 # Resource detection function
 def detect_resources(text):
@@ -160,11 +167,38 @@ with st.sidebar:
     
     st.header("📝 Report Writing")
     with st.expander("EHC Assessment Reports"):
-        if st.button("📋 Start EHC Assessment Report", use_container_width=True):
+        if st.button("📋 Start New EHC Report", use_container_width=True):
             st.session_state.report_mode = "ehc_assessment"
             st.session_state.report_data = {}
             st.session_state.current_section = 0
+            st.session_state.current_report_id = None
             st.rerun()
+        
+        # Show recent reports
+        st.write("**Recent Reports:**")
+        recent_reports = st.session_state.db.list_reports(5)
+        
+        if recent_reports:
+            for report in recent_reports:
+                status = "✅ Complete" if report["is_completed"] else "🔄 In Progress"
+                col1, col2 = st.columns([3, 1])
+                
+                with col1:
+                    st.write(f"{report['child_name']} - {status}")
+                    st.caption(f"Updated: {report['updated_at'][:16]} | ID: {report['id']}")
+                
+                with col2:
+                    if st.button("📖 Load", key=f"load_{report['id']}", help="Continue this report"):
+                        # Load the report
+                        loaded_report = st.session_state.db.load_report(report['id'])
+                        if loaded_report:
+                            st.session_state.report_mode = loaded_report["report_type"]
+                            st.session_state.report_data = loaded_report["data"]
+                            st.session_state.current_section = loaded_report["current_section"]
+                            st.session_state.current_report_id = report['id']
+                            st.rerun()
+        else:
+            st.caption("No saved reports yet")
 
 # Main content area - check if in report mode
 if st.session_state.report_mode == "ehc_assessment":
@@ -195,10 +229,18 @@ if st.session_state.report_mode == "ehc_assessment":
     if current_section == "Child Information & Referral":
         st.write("Let's start with basic information about the child and referral:")
         st.caption("💭 *Write however feels natural - notes, bullet points, full sentences. I'll format it properly later.*")
-        name = st.text_input("Child's name (or initials):", key="child_name")
-        age = st.text_input("Age and date of birth:", key="child_age")
-        school = st.text_input("School/setting:", key="child_school")
-        referral_reason = st.text_area("Reason for referral:", key="referral_reason", 
+        name = st.text_input("Child's name (or initials):", 
+                            value=st.session_state.report_data.get("child_name", ""), 
+                            key="child_name")
+        age = st.text_input("Age and date of birth:", 
+                           value=st.session_state.report_data.get("child_age", ""), 
+                           key="child_age")
+        school = st.text_input("School/setting:", 
+                              value=st.session_state.report_data.get("child_school", ""), 
+                              key="child_school")
+        referral_reason = st.text_area("Reason for referral:", 
+                                      value=st.session_state.report_data.get("referral_reason", ""),
+                                      key="referral_reason", 
                                       help="Just jot down the key concerns - bullet points are fine!")
         
         # Navigation buttons
@@ -225,13 +267,21 @@ if st.session_state.report_mode == "ehc_assessment":
     elif current_section == "Background & History":
         st.write("Tell me about the child's background and developmental history:")
         st.caption("💭 *Don't worry about perfect sentences - capture what you know however works for you.*")
-        family_background = st.text_area("Family background and home circumstances:", key="family_background",
+        family_background = st.text_area("Family background and home circumstances:", 
+                                        value=st.session_state.report_data.get("family_background", ""),
+                                        key="family_background",
                                         help="Quick notes are fine - family structure, any relevant circumstances")
-        developmental_history = st.text_area("Early developmental history (milestones, concerns):", key="developmental_history",
+        developmental_history = st.text_area("Early developmental history (milestones, concerns):", 
+                                           value=st.session_state.report_data.get("developmental_history", ""),
+                                           key="developmental_history",
                                            help="Any developmental info you have - bullet points work great")
-        medical_history = st.text_area("Relevant medical history:", key="medical_history",
+        medical_history = st.text_area("Relevant medical history:", 
+                                     value=st.session_state.report_data.get("medical_history", ""),
+                                     key="medical_history",
                                      help="Just note any relevant medical information")
-        previous_support = st.text_area("Previous educational support and interventions:", key="previous_support",
+        previous_support = st.text_area("Previous educational support and interventions:", 
+                                      value=st.session_state.report_data.get("previous_support", ""),
+                                      key="previous_support",
                                       help="List what's been tried before - informal notes are perfect")
         
         # Navigation buttons
@@ -259,13 +309,21 @@ if st.session_state.report_mode == "ehc_assessment":
     elif current_section == "Assessment Methods & Observations":
         st.write("Details about your assessment approach and observations:")
         st.caption("💭 *Just capture your observations naturally - I'll turn them into professional report language.*")
-        assessment_methods = st.text_area("Assessment methods used (tests, observations, interviews):", key="assessment_methods",
+        assessment_methods = st.text_area("Assessment methods used (tests, observations, interviews):", 
+                                        value=st.session_state.report_data.get("assessment_methods", ""),
+                                        key="assessment_methods",
                                         help="List what you did - WISC-V, observations, etc.")
-        classroom_observation = st.text_area("Classroom observation findings:", key="classroom_observation",
+        classroom_observation = st.text_area("Classroom observation findings:", 
+                                           value=st.session_state.report_data.get("classroom_observation", ""),
+                                           key="classroom_observation",
                                            help="What did you notice? Jot down key observations")
-        child_interaction = st.text_area("Direct interaction with child - behavior and engagement:", key="child_interaction",
+        child_interaction = st.text_area("Direct interaction with child - behavior and engagement:", 
+                                       value=st.session_state.report_data.get("child_interaction", ""),
+                                       key="child_interaction",
                                        help="How was the child during assessment? Informal notes fine")
-        child_views = st.text_area("Child's views and perspectives:", key="child_views",
+        child_views = st.text_area("Child's views and perspectives:", 
+                                 value=st.session_state.report_data.get("child_views", ""),
+                                 key="child_views",
                                  help="What did the child say? Direct quotes or paraphrasing both work")
         
         # Navigation buttons
