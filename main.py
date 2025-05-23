@@ -1,15 +1,15 @@
 import streamlit as st
-from chains.simple_ep_chain import create_ep_chain
+from chains.claude_ep_chain import create_claude_ep_chain
 
 # Set page config first
 st.set_page_config(page_title="Jess - For Educational Psychologists", page_icon="🅹")
 
-# Set OpenAI API Key from Streamlit Secrets
-openai_api_key = st.secrets["OPENAI_API_KEY"]
+# Set Anthropic API Key from Streamlit Secrets
+anthropic_api_key = st.secrets["ANTHROPIC_API_KEY"]
 
 # Initialize chain in session state
 if "ep_chain" not in st.session_state:
-    st.session_state.ep_chain = create_ep_chain(openai_api_key)
+    st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
 
 # Initialize message history in session state
 if "messages" not in st.session_state:
@@ -70,4 +70,4 @@ if user_input := st.chat_input("Ask Jess about EP practice, cases, or profession
 if st.sidebar.button("Clear Conversation"):
     st.session_state.messages = []
     # Reset the chain to clear memory
-    st.session_state.ep_chain = create_ep_chain(openai_api_key)
+    st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
