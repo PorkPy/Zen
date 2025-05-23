@@ -49,8 +49,13 @@ def detect_resources(text):
     
     return resources
 
-# Streamlit UI
-st.title("Jess")
+# Streamlit UI - Make title clickable for new conversation
+if st.button("Jess", type="primary", use_container_width=False, help="Click to start a new conversation"):
+    st.session_state.messages = []
+    st.session_state.mentioned_resources = []
+    st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
+    st.rerun()
+
 st.caption("For Educational Psychologists")
 st.write("")  # Add some spacing
 
@@ -101,19 +106,8 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# Chat input with small new conversation button next to it
-col1, col2 = st.columns([1, 20])  # Very small button, large chat input
-
-with col1:
-    if st.button("🔄", help="New conversation", key="new_conv_bottom"):
-        st.session_state.messages = []
-        st.session_state.mentioned_resources = []
-        st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
-        st.rerun()
-
-with col2:
-    # Chat input (stays in its natural Streamlit position)
-    if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
+# Chat input (natural Streamlit position - no extra buttons!)
+if user_input := st.chat_input("Ask Jess about EP practice, cases, or professional development..."):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": user_input})
         
