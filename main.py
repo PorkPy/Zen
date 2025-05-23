@@ -170,7 +170,7 @@ with st.sidebar:
 if st.session_state.report_mode == "ehc_assessment":
     # EHC Assessment Report Writing Mode
     st.markdown("### 📋 EHC Assessment Report")
-    st.write("I'll guide you through writing an EHC Assessment Report with structured questions.")
+    st.info("💡 **Write naturally!** Use bullet points, notes, or full sentences - whatever works for you. Jess will structure and format everything into a professional report at the end.")
     
     # Report sections
     ehc_sections = [
@@ -194,10 +194,12 @@ if st.session_state.report_mode == "ehc_assessment":
     
     if current_section == "Child Information & Referral":
         st.write("Let's start with basic information about the child and referral:")
+        st.caption("💭 *Write however feels natural - notes, bullet points, full sentences. I'll format it properly later.*")
         name = st.text_input("Child's name (or initials):", key="child_name")
         age = st.text_input("Age and date of birth:", key="child_age")
         school = st.text_input("School/setting:", key="child_school")
-        referral_reason = st.text_area("Reason for referral:", key="referral_reason")
+        referral_reason = st.text_area("Reason for referral:", key="referral_reason", 
+                                      help="Just jot down the key concerns - bullet points are fine!")
         
         # Navigation buttons
         col1, col2, col3 = st.columns([1, 1, 1])
@@ -211,6 +213,74 @@ if st.session_state.report_mode == "ehc_assessment":
                     "child_age": age, 
                     "child_school": school,
                     "referral_reason": referral_reason
+                })
+                st.session_state.current_section += 1
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_mode = None
+                st.success("Report progress saved! You can continue later.")
+                st.rerun()
+                
+    elif current_section == "Background & History":
+        st.write("Tell me about the child's background and developmental history:")
+        st.caption("💭 *Don't worry about perfect sentences - capture what you know however works for you.*")
+        family_background = st.text_area("Family background and home circumstances:", key="family_background",
+                                        help="Quick notes are fine - family structure, any relevant circumstances")
+        developmental_history = st.text_area("Early developmental history (milestones, concerns):", key="developmental_history",
+                                           help="Any developmental info you have - bullet points work great")
+        medical_history = st.text_area("Relevant medical history:", key="medical_history",
+                                     help="Just note any relevant medical information")
+        previous_support = st.text_area("Previous educational support and interventions:", key="previous_support",
+                                      help="List what's been tried before - informal notes are perfect")
+        
+        # Navigation buttons
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section"):
+                st.session_state.current_section -= 1
+                st.rerun()
+        with col2:
+            if st.button("Next Section →"):
+                st.session_state.report_data.update({
+                    "family_background": family_background,
+                    "developmental_history": developmental_history,
+                    "medical_history": medical_history,
+                    "previous_support": previous_support
+                })
+                st.session_state.current_section += 1
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_mode = None
+                st.success("Report progress saved! You can continue later.")
+                st.rerun()
+                
+    elif current_section == "Assessment Methods & Observations":
+        st.write("Details about your assessment approach and observations:")
+        st.caption("💭 *Just capture your observations naturally - I'll turn them into professional report language.*")
+        assessment_methods = st.text_area("Assessment methods used (tests, observations, interviews):", key="assessment_methods",
+                                        help="List what you did - WISC-V, observations, etc.")
+        classroom_observation = st.text_area("Classroom observation findings:", key="classroom_observation",
+                                           help="What did you notice? Jot down key observations")
+        child_interaction = st.text_area("Direct interaction with child - behavior and engagement:", key="child_interaction",
+                                       help="How was the child during assessment? Informal notes fine")
+        child_views = st.text_area("Child's views and perspectives:", key="child_views",
+                                 help="What did the child say? Direct quotes or paraphrasing both work")
+        
+        # Navigation buttons
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section"):
+                st.session_state.current_section -= 1
+                st.rerun()
+        with col2:
+            if st.button("Next Section →"):
+                st.session_state.report_data.update({
+                    "assessment_methods": assessment_methods,
+                    "classroom_observation": classroom_observation,
+                    "child_interaction": child_interaction,
+                    "child_views": child_views
                 })
                 st.session_state.current_section += 1
                 st.rerun()
