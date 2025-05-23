@@ -66,10 +66,10 @@ st.write("")  # Add some spacing
 
 # Sidebar with resources and info
 with st.sidebar:
-    # Compact new conversation button - smaller and positioned better
-    col1, col2 = st.columns([3, 1])
+    # Much more compact new conversation button
+    col1, col2, col3 = st.columns([2, 1, 1])
     with col1:
-        if st.button("💬 New", type="secondary", use_container_width=True, help="Start a new conversation"):
+        if st.button("🔄 New", key="new_conv", help="Start a new conversation"):
             st.session_state.messages = []
             st.session_state.mentioned_resources = []
             st.session_state.ep_chain = create_claude_ep_chain(anthropic_api_key)
@@ -83,8 +83,6 @@ with st.sidebar:
         st.write("• Describe cases naturally - Jess will ask probing questions")
         st.write("• Reference cultural, developmental, and systemic factors") 
         st.write("• Request specific assessments, frameworks, or evidence")
-    
-    st.markdown("---")
     
     st.header("📚 Professional Bodies")
     with st.expander("UK Organizations"):
