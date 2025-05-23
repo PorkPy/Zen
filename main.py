@@ -43,6 +43,22 @@ st.markdown("""
     font-weight: bold !important;
     border-radius: 20px !important;
 }
+
+/* Report display styling */
+.report-section {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin: 1rem 0;
+    border-left: 4px solid #FF69B4;
+}
+
+.report-header {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -73,6 +89,8 @@ if "current_section" not in st.session_state:
     st.session_state.current_section = 0
 if "current_report_id" not in st.session_state:
     st.session_state.current_report_id = None
+if "generated_report" not in st.session_state:
+    st.session_state.generated_report = None
 
 # Resource detection function
 def detect_resources(text):
@@ -104,6 +122,65 @@ def detect_resources(text):
         resources["PICA Information"] = "https://www.nationaleatingdisorders.org/pica"
     
     return resources
+
+def generate_professional_report(report_data, anthropic_api_key):
+    """Generate a professional EHC report from the collected data"""
+    
+    # Create a specialized chain for report generation
+    from langchain_anthropic import ChatAnthropic
+    from langchain.prompts import PromptTemplate
+    
+    llm = ChatAnthropic(
+        model="claude-3-5-sonnet-20241022",
+        anthropic_api_key=anthropic_api_key,
+        max_tokens=3000,
+        temperature=0.2
+    )
+    
+    # Comprehensive report generation prompt
+    report_prompt = PromptTemplate(
+        input_variables=["report_data"],
+        template="""
+You are an expert Educational Psychologist writing a professional EHC Assessment Report. 
+
+Transform the following informal notes and data into a comprehensive, professionally written EHC Assessment Report. 
+
+The report should be:
+- Written in professional, clear language appropriate for statutory assessment
+- Well-structured with clear headings
+- Evidence-based and objective
+- Suitable for sharing with parents, schools, and local authority
+- Following standard EHC report format and conventions
+
+Report Data:
+{report_data}
+
+Generate a complete professional EHC Assessment Report with these sections:
+
+1. CHILD INFORMATION & REFERRAL DETAILS
+2. BACKGROUND AND DEVELOPMENTAL HISTORY  
+3. ASSESSMENT METHODS AND OBSERVATIONS
+4. COGNITIVE ASSESSMENT FINDINGS
+5. EDUCATIONAL ATTAINMENT AND PROGRESS
+6. SOCIAL, EMOTIONAL AND BEHAVIOURAL FACTORS
+7. PSYCHOLOGICAL FORMULATION
+8. RECOMMENDATIONS AND PROVISION
+
+Format each section clearly with headings. Write in third person. Use professional language throughout while maintaining accessibility for all readers including parents.
+
+Professional EHC Assessment Report:
+"""
+    )
+    
+    # Format the report data for the prompt
+    formatted_data = ""
+    for key, value in report_data.items():
+        if value and value.strip():
+            formatted_data += f"{key.replace('_', ' ').title()}: {value}\n\n"
+    
+    # Generate the report
+    response = llm.invoke(report_prompt.format(report_data=formatted_data))
+    return response.content
 
 # Streamlit UI - Clean title without button functionality (button now in sidebar)
 st.markdown('<h1 class="fancy-title">🦋 Jess</h1>', unsafe_allow_html=True)
@@ -172,6 +249,7 @@ with st.sidebar:
             st.session_state.report_data = {}
             st.session_state.current_section = 0
             st.session_state.current_report_id = None
+            st.session_state.generated_report = None
             st.rerun()
         
         # Show recent reports
@@ -196,6 +274,7 @@ with st.sidebar:
                             st.session_state.report_data = loaded_report["data"]
                             st.session_state.current_section = loaded_report["current_section"]
                             st.session_state.current_report_id = report['id']
+                            st.session_state.generated_report = None
                             st.rerun()
         else:
             st.caption("No saved reports yet")
@@ -217,6 +296,48 @@ if st.session_state.report_mode == "ehc_assessment":
         "Psychological Formulation",
         "Recommendations & Provision"
     ]
+    
+    # Check if we're viewing the generated report
+    if st.session_state.generated_report:
+        st.markdown("### 📄 Generated Professional Report")
+        
+        # Display the generated report
+        st.markdown('<div class="report-section">', unsafe_allow_html=True)
+        st.markdown(st.session_state.generated_report)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Action buttons
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+        
+        with col1:
+            if st.button("📝 Edit Report Data"):
+                st.session_state.generated_report = None
+                st.rerun()
+        
+        with col2:
+            if st.button("🔄 Regenerate Report"):
+                with st.spinner("Regenerating professional report..."):
+                    st.session_state.generated_report = generate_professional_report(
+                        st.session_state.report_data, anthropic_api_key
+                    )
+                st.rerun()
+        
+        with col3:
+            # Download button
+            st.download_button(
+                label="📥 Download Report",
+                data=st.session_state.generated_report,
+                file_name=f"EHC_Report_{st.session_state.report_data.get('child_name', 'Unknown')}_{st.session_state.current_report_id}.txt",
+                mime="text/plain"
+            )
+        
+        with col4:
+            if st.button("🏠 Back to Main"):
+                st.session_state.report_mode = None
+                st.session_state.generated_report = None
+                st.rerun()
+        
+        return  # Exit early when showing generated report
     
     # Progress indicator
     progress = (st.session_state.current_section + 1) / len(ehc_sections)
@@ -287,29 +408,25 @@ if st.session_state.report_mode == "ehc_assessment":
                 st.success(f"Report saved! ID: {st.session_state.current_report_id}")
                 st.rerun()
                 
-    elif current_section == "Educational Attainment":
-        st.write("Educational attainment and academic performance:")
-        st.caption("💭 *Note current academic levels, progress, and curriculum access naturally.*")
-        
-        academic_levels = st.text_area("Current academic levels and attainment:", 
-                                     value=st.session_state.report_data.get("academic_levels", ""),
-                                     key="academic_levels",
-                                     help="Reading age, maths levels, National Curriculum levels, etc.")
-        
-        curriculum_access = st.text_area("Access to curriculum and learning:", 
-                                        value=st.session_state.report_data.get("curriculum_access", ""),
-                                        key="curriculum_access",
-                                        help="How well can they access mainstream curriculum?")
-        
-        academic_strengths = st.text_area("Academic strengths and interests:", 
-                                        value=st.session_state.report_data.get("academic_strengths", ""),
-                                        key="academic_strengths",
-                                        help="What subjects/areas does the child excel in?")
-        
-        learning_barriers = st.text_area("Barriers to learning and progress:", 
-                                        value=st.session_state.report_data.get("learning_barriers", ""),
-                                        key="learning_barriers",
-                                        help="What's preventing optimal academic progress?")
+    elif current_section == "Background & History":
+        st.write("Tell me about the child's background and developmental history:")
+        st.caption("💭 *Don't worry about perfect sentences - capture what you know however works for you.*")
+        family_background = st.text_area("Family background and home circumstances:", 
+                                        value=st.session_state.report_data.get("family_background", ""),
+                                        key="family_background",
+                                        help="Quick notes are fine - family structure, any relevant circumstances")
+        developmental_history = st.text_area("Early developmental history (milestones, concerns):", 
+                                           value=st.session_state.report_data.get("developmental_history", ""),
+                                           key="developmental_history",
+                                           help="Any developmental info you have - bullet points work great")
+        medical_history = st.text_area("Relevant medical history:", 
+                                     value=st.session_state.report_data.get("medical_history", ""),
+                                     key="medical_history",
+                                     help="Just note any relevant medical information")
+        previous_support = st.text_area("Previous educational support and interventions:", 
+                                      value=st.session_state.report_data.get("previous_support", ""),
+                                      key="previous_support",
+                                      help="List what's been tried before - informal notes are perfect")
         
         # Navigation buttons
         col1, col2, col3 = st.columns([1, 1, 1])
@@ -512,7 +629,8 @@ if st.session_state.report_mode == "ehc_assessment":
                 st.session_state.current_section -= 1
                 st.rerun()
         with col2:
-            if st.button("🎯 Complete Report"):
+            if st.button("🎯 Generate Professional Report"):
+                # Save current data first
                 st.session_state.report_data.update({
                     "educational_provision": educational_provision,
                     "interventions": interventions,
@@ -525,7 +643,7 @@ if st.session_state.report_mode == "ehc_assessment":
                         st.session_state.report_data.get("child_name", "Unknown"), "ehc_assessment"
                     )
                 
-                # Mark as completed
+                # Mark as completed and save
                 st.session_state.db.save_report(
                     st.session_state.current_report_id,
                     "ehc_assessment",
@@ -535,8 +653,13 @@ if st.session_state.report_mode == "ehc_assessment":
                     is_completed=True
                 )
                 
-                st.session_state.report_mode = None
-                st.success(f"🎉 Report completed and saved! ID: {st.session_state.current_report_id}")
+                # Generate the professional report
+                with st.spinner("🦋 Jess is transforming your notes into a professional EHC report..."):
+                    st.session_state.generated_report = generate_professional_report(
+                        st.session_state.report_data, anthropic_api_key
+                    )
+                
+                st.success(f"🎉 Professional report generated! ID: {st.session_state.current_report_id}")
                 st.balloons()
                 st.rerun()
         with col3:
@@ -564,90 +687,6 @@ if st.session_state.report_mode == "ehc_assessment":
                 st.session_state.report_mode = None
                 st.success(f"Report saved! ID: {st.session_state.current_report_id}")
                 st.rerun()
-                
-    elif current_section == "Background & History":
-        st.write("Tell me about the child's background and developmental history:")
-        st.caption("💭 *Don't worry about perfect sentences - capture what you know however works for you.*")
-        family_background = st.text_area("Family background and home circumstances:", 
-                                        value=st.session_state.report_data.get("family_background", ""),
-                                        key="family_background",
-                                        help="Quick notes are fine - family structure, any relevant circumstances")
-        developmental_history = st.text_area("Early developmental history (milestones, concerns):", 
-                                           value=st.session_state.report_data.get("developmental_history", ""),
-                                           key="developmental_history",
-                                           help="Any developmental info you have - bullet points work great")
-        medical_history = st.text_area("Relevant medical history:", 
-                                     value=st.session_state.report_data.get("medical_history", ""),
-                                     key="medical_history",
-                                     help="Just note any relevant medical information")
-        previous_support = st.text_area("Previous educational support and interventions:", 
-                                      value=st.session_state.report_data.get("previous_support", ""),
-                                      key="previous_support",
-                                      help="List what's been tried before - informal notes are perfect")
-        
-        # Navigation buttons
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col1:
-            if st.button("← Previous Section"):
-                st.session_state.current_section -= 1
-                st.rerun()
-        with col2:
-            if st.button("Next Section →"):
-                st.session_state.report_data.update({
-                    "family_background": family_background,
-                    "developmental_history": developmental_history,
-                    "medical_history": medical_history,
-                    "previous_support": previous_support
-                })
-                st.session_state.current_section += 1
-                st.rerun()
-        with col3:
-            if st.button("💾 Save & Exit"):
-                st.session_state.report_mode = None
-                st.success("Report progress saved! You can continue later.")
-                st.rerun()
-                
-    elif current_section == "Assessment Methods & Observations":
-        st.write("Details about your assessment approach and observations:")
-        st.caption("💭 *Just capture your observations naturally - I'll turn them into professional report language.*")
-        assessment_methods = st.text_area("Assessment methods used (tests, observations, interviews):", 
-                                        value=st.session_state.report_data.get("assessment_methods", ""),
-                                        key="assessment_methods",
-                                        help="List what you did - WISC-V, observations, etc.")
-        classroom_observation = st.text_area("Classroom observation findings:", 
-                                           value=st.session_state.report_data.get("classroom_observation", ""),
-                                           key="classroom_observation",
-                                           help="What did you notice? Jot down key observations")
-        child_interaction = st.text_area("Direct interaction with child - behavior and engagement:", 
-                                       value=st.session_state.report_data.get("child_interaction", ""),
-                                       key="child_interaction",
-                                       help="How was the child during assessment? Informal notes fine")
-        child_views = st.text_area("Child's views and perspectives:", 
-                                 value=st.session_state.report_data.get("child_views", ""),
-                                 key="child_views",
-                                 help="What did the child say? Direct quotes or paraphrasing both work")
-        
-        # Navigation buttons
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col1:
-            if st.button("← Previous Section"):
-                st.session_state.current_section -= 1
-                st.rerun()
-        with col2:
-            if st.button("Next Section →"):
-                st.session_state.report_data.update({
-                    "assessment_methods": assessment_methods,
-                    "classroom_observation": classroom_observation,
-                    "child_interaction": child_interaction,
-                    "child_views": child_views
-                })
-                st.session_state.current_section += 1
-                st.rerun()
-        with col3:
-            if st.button("💾 Save & Exit"):
-                st.session_state.report_mode = None
-                st.success("Report progress saved! You can continue later.")
-                st.rerun()
     
     # Add spacing before exit button
     st.markdown("---")
@@ -656,6 +695,7 @@ if st.session_state.report_mode == "ehc_assessment":
         st.session_state.report_mode = None
         st.session_state.report_data = {}
         st.session_state.current_section = 0
+        st.session_state.generated_report = None
         st.rerun()
 
 else:
@@ -702,4 +742,206 @@ if st.session_state.report_mode is None and st.session_state.mentioned_resources
     cols = st.columns(2)
     for i, resource in enumerate(st.session_state.mentioned_resources[-6:]):  # Show last 6
         with cols[i % 2]:
-            st.markdown(f"[{resource['name']}]({resource['link']})")
+            st.markdown(f"[{resource['name']}]({resource['link']})")session_state.current_section -= 1
+                st.rerun()
+        with col2:
+            if st.button("Next Section →"):
+                st.session_state.report_data.update({
+                    "family_background": family_background,
+                    "developmental_history": developmental_history,
+                    "medical_history": medical_history,
+                    "previous_support": previous_support
+                })
+                st.session_state.current_section += 1
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_data.update({
+                    "family_background": family_background,
+                    "developmental_history": developmental_history,
+                    "medical_history": medical_history,
+                    "previous_support": previous_support
+                })
+                
+                if not st.session_state.current_report_id:
+                    st.session_state.current_report_id = st.session_state.db.generate_report_id(
+                        st.session_state.report_data.get("child_name", "Unknown"), "ehc_assessment"
+                    )
+                
+                st.session_state.db.save_report(
+                    st.session_state.current_report_id,
+                    "ehc_assessment",
+                    st.session_state.report_data.get("child_name", "Unknown"),
+                    st.session_state.report_data,
+                    st.session_state.current_section
+                )
+                
+                st.session_state.report_mode = None
+                st.success(f"Report saved! ID: {st.session_state.current_report_id}")
+                st.rerun()
+                
+    elif current_section == "Assessment Methods & Observations":
+        st.write("Details about your assessment approach and observations:")
+        st.caption("💭 *Just capture your observations naturally - I'll turn them into professional report language.*")
+        assessment_methods = st.text_area("Assessment methods used (tests, observations, interviews):", 
+                                        value=st.session_state.report_data.get("assessment_methods", ""),
+                                        key="assessment_methods",
+                                        help="List what you did - WISC-V, observations, etc.")
+        classroom_observation = st.text_area("Classroom observation findings:", 
+                                           value=st.session_state.report_data.get("classroom_observation", ""),
+                                           key="classroom_observation",
+                                           help="What did you notice? Jot down key observations")
+        child_interaction = st.text_area("Direct interaction with child - behavior and engagement:", 
+                                       value=st.session_state.report_data.get("child_interaction", ""),
+                                       key="child_interaction",
+                                       help="How was the child during assessment? Informal notes fine")
+        child_views = st.text_area("Child's views and perspectives:", 
+                                 value=st.session_state.report_data.get("child_views", ""),
+                                 key="child_views",
+                                 help="What did the child say? Direct quotes or paraphrasing both work")
+        
+        # Navigation buttons
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section"):
+                st.session_state.current_section -= 1
+                st.rerun()
+        with col2:
+            if st.button("Next Section →"):
+                st.session_state.report_data.update({
+                    "assessment_methods": assessment_methods,
+                    "classroom_observation": classroom_observation,
+                    "child_interaction": child_interaction,
+                    "child_views": child_views
+                })
+                st.session_state.current_section += 1
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_data.update({
+                    "assessment_methods": assessment_methods,
+                    "classroom_observation": classroom_observation,
+                    "child_interaction": child_interaction,
+                    "child_views": child_views
+                })
+                
+                if not st.session_state.current_report_id:
+                    st.session_state.current_report_id = st.session_state.db.generate_report_id(
+                        st.session_state.report_data.get("child_name", "Unknown"), "ehc_assessment"
+                    )
+                
+                st.session_state.db.save_report(
+                    st.session_state.current_report_id,
+                    "ehc_assessment",
+                    st.session_state.report_data.get("child_name", "Unknown"),
+                    st.session_state.report_data,
+                    st.session_state.current_section
+                )
+                
+                st.session_state.report_mode = None
+                st.success(f"Report saved! ID: {st.session_state.current_report_id}")
+                st.rerun()
+                
+    elif current_section == "Cognitive Assessment":
+        st.write("Cognitive assessment results and findings:")
+        st.caption("💭 *Record test results, observations during testing, and what they mean. Don't worry about formatting.*")
+        
+        cognitive_tests = st.text_area("Cognitive tests administered:", 
+                                     value=st.session_state.report_data.get("cognitive_tests", ""),
+                                     key="cognitive_tests",
+                                     help="WISC-V, BPVS, etc. - just list what you used")
+        
+        cognitive_scores = st.text_area("Test scores and index scores:", 
+                                      value=st.session_state.report_data.get("cognitive_scores", ""),
+                                      key="cognitive_scores",
+                                      help="Raw scores, standard scores, percentiles - whatever format works",
+                                      height=100)
+        
+        cognitive_strengths = st.text_area("Cognitive strengths observed:", 
+                                         value=st.session_state.report_data.get("cognitive_strengths", ""),
+                                         key="cognitive_strengths",
+                                         help="What did the child do well? Areas of strength?")
+        
+        cognitive_difficulties = st.text_area("Areas of cognitive difficulty:", 
+                                            value=st.session_state.report_data.get("cognitive_difficulties", ""),
+                                            key="cognitive_difficulties",
+                                            help="Where did they struggle? What patterns emerged?")
+        
+        testing_behavior = st.text_area("Behavior and approach during testing:", 
+                                      value=st.session_state.report_data.get("testing_behavior", ""),
+                                      key="testing_behavior",
+                                      help="How did they engage? Any factors affecting performance?")
+        
+        # Navigation buttons
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section"):
+                st.session_state.current_section -= 1
+                st.rerun()
+        with col2:
+            if st.button("Next Section →"):
+                st.session_state.report_data.update({
+                    "cognitive_tests": cognitive_tests,
+                    "cognitive_scores": cognitive_scores,
+                    "cognitive_strengths": cognitive_strengths,
+                    "cognitive_difficulties": cognitive_difficulties,
+                    "testing_behavior": testing_behavior
+                })
+                st.session_state.current_section += 1
+                st.rerun()
+        with col3:
+            if st.button("💾 Save & Exit"):
+                st.session_state.report_data.update({
+                    "cognitive_tests": cognitive_tests,
+                    "cognitive_scores": cognitive_scores,
+                    "cognitive_strengths": cognitive_strengths,
+                    "cognitive_difficulties": cognitive_difficulties,
+                    "testing_behavior": testing_behavior
+                })
+                
+                if not st.session_state.current_report_id:
+                    st.session_state.current_report_id = st.session_state.db.generate_report_id(
+                        st.session_state.report_data.get("child_name", "Unknown"), "ehc_assessment"
+                    )
+                
+                st.session_state.db.save_report(
+                    st.session_state.current_report_id,
+                    "ehc_assessment",
+                    st.session_state.report_data.get("child_name", "Unknown"),
+                    st.session_state.report_data,
+                    st.session_state.current_section
+                )
+                
+                st.session_state.report_mode = None
+                st.success(f"Report saved! ID: {st.session_state.current_report_id}")
+                st.rerun()
+    
+    elif current_section == "Educational Attainment":
+        st.write("Educational attainment and academic performance:")
+        st.caption("💭 *Note current academic levels, progress, and curriculum access naturally.*")
+        
+        academic_levels = st.text_area("Current academic levels and attainment:", 
+                                     value=st.session_state.report_data.get("academic_levels", ""),
+                                     key="academic_levels",
+                                     help="Reading age, maths levels, National Curriculum levels, etc.")
+        
+        curriculum_access = st.text_area("Access to curriculum and learning:", 
+                                        value=st.session_state.report_data.get("curriculum_access", ""),
+                                        key="curriculum_access",
+                                        help="How well can they access mainstream curriculum?")
+        
+        academic_strengths = st.text_area("Academic strengths and interests:", 
+                                        value=st.session_state.report_data.get("academic_strengths", ""),
+                                        key="academic_strengths",
+                                        help="What subjects/areas does the child excel in?")
+        
+        learning_barriers = st.text_area("Barriers to learning and progress:", 
+                                        value=st.session_state.report_data.get("learning_barriers", ""),
+                                        key="learning_barriers",
+                                        help="What's preventing optimal academic progress?")
+        
+        # Navigation buttons
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("← Previous Section"):
+                st.
